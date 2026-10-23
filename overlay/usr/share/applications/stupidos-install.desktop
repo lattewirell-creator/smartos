@@ -9,3 +9,4 @@ Icon=stupidos
 Terminal=false
 Categories=System;
 OnlyShowIn=GNOME;
+StartupWMClass=calamares
