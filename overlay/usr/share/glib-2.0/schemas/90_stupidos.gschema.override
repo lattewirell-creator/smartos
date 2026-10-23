@@ -133,6 +133,10 @@ blur=false
 blur=true
 style-dash-to-dock=1
 
+# Buddy's ball is a transparent round window: no rounded-corner frame or shadow around it
+[org.gnome.shell.extensions.rounded-window-corners-reborn]
+blacklist=['stupid-buddy', 'Stupid-buddy']
+
 [org.gnome.shell.extensions.openbar]
 bartype='Islands'
 position='Top'

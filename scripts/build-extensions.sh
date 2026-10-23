@@ -76,6 +76,23 @@ for row in "${ROWS[@]}"; do
             cp "$src/metadata.json" "$src/LICENSE" "$src"/*.js "$src"/*.css "$out/"
             cp -r "$src/resources" "$src/config" "$src/lib" "$src/schemas" "$out/"
             locales "$src/po" "$out" "forge"
+            # Windows that must never be tiled: Buddy's ball and its overlays, and the installer
+            python3 - "$out/config/windows.json" <<'PY'
+import json, sys
+path = sys.argv[1]
+cfg = json.load(open(path))
+ours = [{"wmClass": "stupid-buddy", "mode": "float"}, {"wmClass": "Stupid-buddy", "mode": "float"},
+        {"wmClass": "calamares", "mode": "float"}, {"wmClass": "Calamares", "mode": "float"}]
+cfg["overrides"] = ours + [o for o in cfg["overrides"] if o not in ours]
+json.dump(cfg, open(path, "w"), indent=2)
+PY
+            # House colours for the focus borders; floating windows (like Buddy's ball) get none
+            sed -i -e 's/rgba(236, 94, 94, 1)/rgba(217, 119, 87, 1)/' \
+                   -e 's/rgba(255, 246, 108, 1)/rgba(236, 233, 225, 0.7)/' \
+                   -e 's/rgba(247, 162, 43, 1)/rgba(224, 175, 104, 1)/' \
+                   -e 's/rgba(17, 199, 224, 1)/rgba(122, 162, 196, 1)/' \
+                   -e 's/rgba(180, 167, 214, 1)/rgba(0, 0, 0, 0)/g' "$out/stylesheet.css"
+            grep -q 'rgba(217, 119, 87, 1)' "$out/stylesheet.css"
             ;;
         rounded-window-corners)
             (cd "$src" && npm ci --silent --no-audit --no-fund && npx tsc --outDir "$out")
