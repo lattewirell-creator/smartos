@@ -26,7 +26,7 @@ die() { echo -e "\033[1;31m[stupidos] $*\033[0m" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || die "Run as root: sudo ./build.sh"
 
 HOST_DEPS=(debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed
-           shim-signed mtools dosfstools librsvg2-bin imagemagick fonts-inter)
+           shim-signed mtools dosfstools librsvg2-bin imagemagick fonts-inter git gettext make npm)
 missing=()
 for p in "${HOST_DEPS[@]}"; do dpkg -s "$p" >/dev/null 2>&1 || missing+=("$p"); done
 if [ ${#missing[@]} -gt 0 ]; then
@@ -52,6 +52,7 @@ render_branding() {
     rm -rf "$S" && mkdir -p "$S"
     cp -a "$ROOT_DIR/overlay/." "$S/"
     install -Dm644 "$ROOT_DIR/config/stupid-apps.json" "$S/usr/share/stupidos/stupid-apps.json"
+    "$ROOT_DIR/scripts/build-extensions.sh" "$S"
 
     install -Dm644 "$B/wallpaper-light.svg" "$S/usr/share/backgrounds/stupidos/wallpaper-light.svg"
     install -Dm644 "$B/wallpaper-dark.svg"  "$S/usr/share/backgrounds/stupidos/wallpaper-dark.svg"

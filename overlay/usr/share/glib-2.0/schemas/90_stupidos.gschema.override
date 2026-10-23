@@ -7,7 +7,7 @@ cursor-theme='Yaru'
 font-name='Inter 11'
 document-font-name='Inter 11'
 monospace-font-name='DejaVu Sans Mono 11'
-color-scheme='default'
+color-scheme='prefer-dark'
 clock-show-weekday=true
 show-battery-percentage=true
 font-antialiasing='rgba'
@@ -47,7 +47,7 @@ dynamic-workspaces=true
 
 [org.gnome.shell]
 favorite-apps=['stupidos-install.desktop', '@BROWSER@', 'stupid-mail.desktop', 'stupid-buddy.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
-enabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com']
+enabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com', 'forge@jmmaranan.com', 'blur-my-shell@aunetx', 'rounded-window-corners@fxgn', 'openbar@neuromorph']
 
 [org.gnome.shell.extensions.dash-to-dock]
 dock-position='BOTTOM'
@@ -75,3 +75,93 @@ style-scheme='Adwaita'
 
 [org.gnome.software]
 packaging-format-preference=['flatpak', 'deb']
+
+# ---------------------------------------------------------------------------
+# The Stupid OS look: tiling with gaps, glass, rounded corners and a floating
+# island bar (in the spirit of Hyprland), all in the house colours.
+# ---------------------------------------------------------------------------
+
+[org.gnome.shell.extensions.forge]
+tiling-mode-enabled=true
+quick-settings-enabled=true
+window-gap-size=uint32 10
+window-gap-hidden-on-single=false
+focus-border-toggle=true
+focus-border-size=uint32 2
+focus-border-color='rgba(217, 119, 87, 1)'
+split-border-color='rgba(236, 233, 225, 0.6)'
+preview-hint-enabled=true
+move-pointer-focus-enabled=false
+
+# Hyprland-style: Super+arrows move focus, Shift moves the window, Ctrl swaps it.
+# (Forge's vim keys would steal Super+L, the lock screen, and Super+H/V from GNOME.)
+[org.gnome.shell.extensions.forge.keybindings]
+window-focus-left=['<Super>Left']
+window-focus-right=['<Super>Right']
+window-focus-up=['<Super>Up']
+window-focus-down=['<Super>Down']
+window-move-left=['<Shift><Super>Left']
+window-move-right=['<Shift><Super>Right']
+window-move-up=['<Shift><Super>Up']
+window-move-down=['<Shift><Super>Down']
+window-swap-left=['<Ctrl><Super>Left']
+window-swap-right=['<Ctrl><Super>Right']
+window-swap-up=['<Ctrl><Super>Up']
+window-swap-down=['<Ctrl><Super>Down']
+con-split-horizontal=['<Super>z']
+con-split-vertical=['<Shift><Super>z']
+
+[org.gnome.mutter.keybindings]
+toggle-tiled-left=[]
+toggle-tiled-right=[]
+
+[org.gnome.desktop.wm.keybindings]
+maximize=[]
+unmaximize=[]
+move-to-monitor-left=[]
+move-to-monitor-right=[]
+move-to-monitor-up=[]
+move-to-monitor-down=[]
+close=['<Super>q', '<Alt>F4']
+toggle-fullscreen=['<Super>f']
+
+# The island bar owns the top panel; Blur my Shell does the overview, dock and app grid
+[org.gnome.shell.extensions.blur-my-shell.panel]
+blur=false
+
+[org.gnome.shell.extensions.blur-my-shell.dash-to-dock]
+blur=true
+style-dash-to-dock=1
+
+[org.gnome.shell.extensions.openbar]
+bartype='Islands'
+position='Top'
+height=34.0
+margin=6.0
+bradius=14.0
+bwidth=1
+neon=true
+shadow=true
+font='Inter Semi-Bold 10.5'
+bgcolor=['0.122', '0.118', '0.114']
+dark-bgcolor=['0.122', '0.118', '0.114']
+bgalpha=0.0
+isalpha=0.78
+fgcolor=['0.925', '0.914', '0.882']
+dark-fgcolor=['0.925', '0.914', '0.882']
+bcolor=['0.851', '0.467', '0.341']
+dark-bcolor=['0.851', '0.467', '0.341']
+balpha=0.55
+hcolor=['0.851', '0.467', '0.341']
+dark-hcolor=['0.851', '0.467', '0.341']
+halpha=0.6
+accent-override=true
+accent-color=['0.851', '0.467', '0.341']
+dark-accent-color=['0.851', '0.467', '0.341']
+light-accent-color=['0.851', '0.467', '0.341']
+mbgcolor=['0.122', '0.118', '0.114']
+dark-mbgcolor=['0.122', '0.118', '0.114']
+mbgalpha=0.92
+apply-menu-shell=true
+apply-accent-shell=true
+color-scheme='prefer-dark'

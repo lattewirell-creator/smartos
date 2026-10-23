@@ -6,7 +6,7 @@ Ett lugnt, snyggt och komplett operativsystem för vardagen. Stupid OS bygger p�
 
 ## Det här ingår
 
-- **Skrivbord:** GNOME i Stupid OS-design med en docka längst ner som döljer sig själv, typsnittet Inter, egna bakgrundsbilder för ljust och mörkt läge och en egen startskärm.
+- **Skrivbord:** GNOME med ett utseende i Hyprland-anda: fönster som lägger sig sida vid sida automatiskt med luft emellan, rundade hörn, glaseffekt, en svävande toppbar i öar och en terrakottafärgad ram runt fönstret du jobbar i. Mörkt läge som standard, typsnittet Inter, egna bakgrundsbilder och en egen startskärm.
 - **The Stupid Company-appar:** The Stupid Browser är standardwebbläsare, The Stupid Mail sköter mejlen och The Stupid Buddy är systemets AI-assistent. Tryck **Super+Mellanslag** var du än är, skriv eller säg vad du vill ha hjälp med, så öppnar Buddy appar, ändrar inställningar, letar fram filer och skriver texter åt dig.
 - **Stupid Apps:** varje dag kollar Stupid OS efter nya versioner av apparna och installerar dem automatiskt. Nya appar från The Stupid Company dyker upp av sig själva, se nedan.
 - **Fler appar från start:** LibreOffice (Writer, Calc, Impress), Filer, Textredigerare, Terminal, Kalender, Kalkylator, Bilder, Video, Musik, Dokumentskanner, Säkerhetskopiering med mera.
@@ -41,6 +41,21 @@ copy /b StupidOS-1.0-amd64.iso.part00+StupidOS-1.0-amd64.iso.part01 StupidOS-1.0
 
 Vill du testa i en virtuell maskin först kör du `./scripts/test-vm.sh` (behöver paketen `qemu-system-x86` och `ovmf`).
 
+## Kortkommandon
+
+| Tangent | Gör |
+|---|---|
+| Super+Mellanslag | Fråga Buddy |
+| Super+piltangent | Flytta fokus till fönstret åt det hållet |
+| Shift+Super+piltangent | Flytta fönstret |
+| Ctrl+Super+piltangent | Byt plats på två fönster |
+| Super+C | Låt fönstret sväva fritt / lägg tillbaka det i rutnätet |
+| Super+W | Slå av eller på automatisk fönsterplacering |
+| Super+F | Helskärm |
+| Super+Q | Stäng fönstret |
+
+Automatisk fönsterplacering går också att slå av och på i snabbinställningarna uppe till höger.
+
 ## Stupid Apps
 
 Listan över The Stupid Company-appar ligger i `config/stupid-apps.json`. Varje Stupid OS-dator läser listan härifrån en gång om dagen, installerar appar som saknas och uppdaterar de som har en nyare version. Så här lägger du till en ny app:
@@ -60,6 +75,7 @@ Repot behöver vara publikt för att datorerna ska kunna läsa listan. Är det p
 | Vilka program som ingår | `config/packages.list` |
 | The Stupid Company-appar | `config/stupid-apps.json` |
 | Logotyp och bakgrundsbilder | `branding/` |
+| GNOME-tillägg för utseendet | `scripts/build-extensions.sh` |
 | Skrivbordets standardinställningar | `overlay/usr/share/glib-2.0/schemas/90_stupidos.gschema.override` |
 | Installationsprogrammet | `overlay/etc/calamares/` |
 | Själva bygget | `build.sh` och `scripts/chroot-setup.sh` |

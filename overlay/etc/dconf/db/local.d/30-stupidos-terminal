@@ -1,0 +1,22 @@
+# Terminal: warm dark glass with a terracotta cursor
+[org/gnome/terminal/legacy/profiles:]
+default='b1dcc9dd-5262-4d8d-a863-c897e6d979b9'
+list=['b1dcc9dd-5262-4d8d-a863-c897e6d979b9']
+
+[org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+visible-name='Stupid OS'
+use-theme-colors=false
+background-color='rgb(31,30,29)'
+foreground-color='rgb(236,233,225)'
+bold-color-same-as-fg=true
+cursor-colors-set=true
+cursor-background-color='rgb(217,119,87)'
+cursor-foreground-color='rgb(31,30,29)'
+highlight-colors-set=true
+highlight-background-color='rgb(217,119,87)'
+highlight-foreground-color='rgb(31,30,29)'
+use-transparent-background=true
+background-transparency-percent=14
+palette=['rgb(42,40,38)', 'rgb(217,119,87)', 'rgb(124,159,108)', 'rgb(224,175,104)', 'rgb(122,162,196)', 'rgb(186,140,190)', 'rgb(118,180,176)', 'rgb(236,233,225)', 'rgb(122,118,106)', 'rgb(232,146,115)', 'rgb(152,187,135)', 'rgb(240,198,130)', 'rgb(150,186,218)', 'rgb(210,166,214)', 'rgb(146,206,200)', 'rgb(250,249,245)']
+cursor-shape='ibeam'
+audible-bell=false
