@@ -2,11 +2,65 @@ name: Build Stupid OS ISO
 
 on:
   workflow_dispatch:
+    inputs:
+      apps_ref:
+        description: "Branch or tag of the Stupid apps to build into the ISO (empty = use their latest GitHub releases)"
+        required: false
+        default: "main"
   push:
     tags: ["v*"]
 
 jobs:
-  build:
+  # The Stupid apps are built from source so the ISO doesn't depend on their Linux releases being out.
+  # If one fails, the ISO is still built and that app comes from its latest release instead.
+  browser:
+    if: github.event_name == 'push' || inputs.apps_ref != ''
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: lattewirell-creator/stupid-browser, ref: "${{ inputs.apps_ref || 'main' }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci && node node_modules/electron/install.js && npm run dist:linux
+      - uses: actions/upload-artifact@v4
+        with: { name: app-browser, path: release/*-linux-amd64.deb }
+
+  mail:
+    if: github.event_name == 'push' || inputs.apps_ref != ''
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: lattewirell-creator/stupid-mail, ref: "${{ inputs.apps_ref || 'main' }}" }
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev libgtk-3-dev libssl-dev libdbus-1-dev
+          rustup update stable && rustup default stable
+          cargo install cargo-deb --locked
+          scripts/build-linux.sh
+      - uses: actions/upload-artifact@v4
+        with: { name: app-mail, path: release-*/*-linux-amd64.deb }
+
+  buddy:
+    if: github.event_name == 'push' || inputs.apps_ref != ''
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: lattewirell-creator/stupid-buddy, ref: "${{ inputs.apps_ref || 'main' }}" }
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev libgtk-3-dev libdbus-1-dev pkg-config imagemagick
+          rustup update stable && rustup default stable
+          cargo install cargo-deb --locked
+          linux/build.sh
+      - uses: actions/upload-artifact@v4
+        with: { name: app-buddy, path: dist/*-linux-amd64.deb }
+
+  iso:
+    needs: [browser, mail, buddy]
+    if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
@@ -16,23 +70,33 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
           sudo docker image prune --all --force || true
-          df -h /
+          df -h / /mnt
+
+      - name: Collect the app packages
+        uses: actions/download-artifact@v4
+        with: { pattern: "app-*", path: apps, merge-multiple: true }
+        continue-on-error: true
 
       - name: Build ISO
-        run: sudo WORK=/mnt/stupidos-work ./build.sh
+        run: |
+          mkdir -p apps && ls -l apps
+          sudo WORK=/mnt/stupidos-work STUPID_APPS_DIR="$PWD/apps" ./build.sh
 
       - name: Split ISO for the release (GitHub caps files at 2 GB)
         run: |
           cd out
           sudo chown -R "$USER" .
-          split -b 1900M -d -a 2 StupidOS-*-amd64.iso "$(ls StupidOS-*-amd64.iso).part"
+          iso=$(ls StupidOS-*-amd64.iso)
+          split -b 1900M -d -a 2 "$iso" "$iso.part"
           ls -lh
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: stupidos-iso
-          path: out/*.iso.part*
+          path: |
+            out/*.iso.part*
+            out/*.sha256
           retention-days: 14
 
       - name: Publish release
