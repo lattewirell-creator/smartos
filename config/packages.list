@@ -67,6 +67,9 @@ fonts-dejavu-core
 fonts-liberation2
 dconf-cli
 xwayland
+xorg
+xserver-xorg-video-all
+xserver-xorg-input-all
 x11-xserver-utils
 # Hardware, network, sound, printing
 network-manager
