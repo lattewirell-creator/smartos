@@ -1,0 +1,12 @@
+[org/gnome/login-screen]
+logo='/usr/share/pixmaps/smartos-wordmark-small.png'
+
+[org/gnome/desktop/interface]
+font-name='Inter 11'
+gtk-theme='Yaru'
+icon-theme='Yaru'
+cursor-theme='Yaru'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+primary-color='#1F1E1D'

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>SmartOS Solnedgång</name>
+    <filename>/usr/share/backgrounds/smartos/wallpaper-light.svg</filename>
+    <filename-dark>/usr/share/backgrounds/smartos/wallpaper-dark.svg</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#FAF9F5</pcolor>
+    <scolor>#1F1E1D</scolor>
+  </wallpaper>
+</wallpapers>

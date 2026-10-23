@@ -1,0 +1,72 @@
+# SmartOS desktop defaults. Users can change all of these in Settings.
+
+[org.gnome.desktop.interface]
+gtk-theme='Yaru'
+icon-theme='Yaru'
+cursor-theme='Yaru'
+font-name='Inter 11'
+document-font-name='Inter 11'
+monospace-font-name='DejaVu Sans Mono 11'
+color-scheme='default'
+clock-show-weekday=true
+show-battery-percentage=true
+font-antialiasing='rgba'
+font-hinting='slight'
+
+[org.gnome.desktop.wm.preferences]
+titlebar-font='Inter Semi-Bold 11'
+button-layout='appmenu:minimize,maximize,close'
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-light.svg'
+picture-uri-dark='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+picture-options='zoom'
+primary-color='#FAF9F5'
+secondary-color='#EFEBE1'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+picture-options='zoom'
+primary-color='#1F1E1D'
+
+[org.gnome.desktop.sound]
+theme-name='Yaru'
+
+[org.gnome.desktop.peripherals.touchpad]
+tap-to-click=true
+natural-scroll=true
+
+[org.gnome.mutter]
+center-new-windows=true
+dynamic-workspaces=true
+
+[org.gnome.shell]
+favorite-apps=['smartos-install.desktop', '@BROWSER@', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Settings.desktop']
+enabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com']
+
+[org.gnome.shell.extensions.dash-to-dock]
+dock-position='BOTTOM'
+extend-height=false
+dock-fixed=false
+autohide=true
+intellihide=true
+intellihide-mode='FOCUS_APPLICATION_WINDOWS'
+dash-max-icon-size=44
+show-trash=false
+show-mounts=false
+show-apps-at-top=false
+transparency-mode='FIXED'
+background-opacity=0.75
+custom-background-color=false
+running-indicator-style='DOTS'
+click-action='minimize-or-previews'
+height-fraction=0.9
+
+[org.gnome.nautilus.preferences]
+default-folder-viewer='icon-view'
+
+[org.gnome.TextEditor]
+style-scheme='Adwaita'
+
+[org.gnome.software]
+packaging-format-preference=['flatpak', 'deb']

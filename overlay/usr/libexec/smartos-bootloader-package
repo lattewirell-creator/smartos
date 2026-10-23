@@ -1,0 +1,21 @@
+#!/bin/sh
+# Called by the installer inside the target system, after GRUB is installed.
+# The live image ships grub-efi-amd64. On BIOS machines we switch to grub-pc
+# (shipped offline in /opt/smartos/debs) so future kernel updates refresh GRUB.
+export DEBIAN_FRONTEND=noninteractive
+set -x
+if [ ! -d /sys/firmware/efi ]; then
+    rootdev=$(findmnt -no SOURCE /)
+    disk=$(lsblk -no PKNAME "$rootdev" 2>/dev/null | tail -1)
+    # LUKS/LVM: walk up until we reach a real disk
+    while [ -n "$disk" ] && [ "$(lsblk -dno TYPE "/dev/$disk" 2>/dev/null)" != "disk" ]; do
+        disk=$(lsblk -no PKNAME "/dev/$disk" 2>/dev/null | tail -1)
+    done
+    if [ -n "$disk" ]; then
+        echo "grub-pc grub-pc/install_devices multiselect /dev/$disk" | debconf-set-selections
+    fi
+    apt-get -y install --allow-remove-essential /opt/smartos/debs/*.deb || dpkg -i --auto-deconfigure /opt/smartos/debs/*.deb || true
+fi
+rm -rf /opt/smartos/debs
+update-grub || true
+exit 0

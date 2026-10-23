@@ -1,0 +1,44 @@
+name: Build SmartOS ISO
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune --all --force || true
+          df -h /
+
+      - name: Build ISO
+        run: sudo WORK=/mnt/smartos-work ./build.sh
+
+      - name: Split ISO for the release (GitHub caps files at 2 GB)
+        run: |
+          cd out
+          sudo chown -R "$USER" .
+          split -b 1900M -d -a 2 SmartOS-*-amd64.iso "$(ls SmartOS-*-amd64.iso).part"
+          ls -lh
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smartos-iso
+          path: out/*.iso.part*
+          retention-days: 14
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/*.iso.part*
+            out/*.sha256

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Install SmartOS
+Name[sv]=Installera SmartOS
+Comment=Install SmartOS on this computer
+Comment[sv]=Installera SmartOS på den här datorn
+Exec=smartos-install
+Icon=smartos
+Terminal=false
+Categories=System;
+OnlyShowIn=GNOME;

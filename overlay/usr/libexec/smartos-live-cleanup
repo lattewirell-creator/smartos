@@ -1,0 +1,11 @@
+#!/bin/sh
+# Called by the installer inside the target system.
+export DEBIAN_FRONTEND=noninteractive
+set -x
+apt-get -y purge casper calamares calamares-settings-ubuntu-common kdialog || true
+apt-get -y autoremove --purge || true
+rm -f /usr/share/applications/smartos-install.desktop /usr/bin/smartos-install
+rm -rf /etc/calamares
+# The live user's passwordless sudo must never reach an installed system
+rm -f /etc/sudoers.d/casper
+exit 0

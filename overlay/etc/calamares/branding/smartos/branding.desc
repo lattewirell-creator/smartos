@@ -1,0 +1,34 @@
+---
+componentName: smartos
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 1000px,640px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+
+strings:
+    productName:         SmartOS
+    shortProductName:    SmartOS
+    version:             1.0
+    shortVersion:        1.0
+    versionedName:       SmartOS 1.0
+    shortVersionedName:  SmartOS 1.0
+    bootloaderEntryName: SmartOS
+    productUrl:          https://github.com/
+    supportUrl:          https://help.ubuntu.com/
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "icon.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+slideshowAPI:            2
+
+style:
+   SidebarBackground:        "#1F1E1D"
+   SidebarText:              "#ECE9E1"
+   SidebarTextCurrent:       "#FFFFFF"
+   SidebarBackgroundCurrent: "#D97757"
