@@ -82,6 +82,10 @@ gnome-bluetooth-3-common
 pipewire-audio
 wireplumber
 pipewire-pulse
+pipewire-bin
+speech-dispatcher
+libnotify-bin
+brightnessctl
 alsa-ucm-conf
 cups
 cups-browsed

@@ -115,6 +115,10 @@ else
     stupid-apps sync || echo "WARNING: some Stupid apps failed to install"
 fi
 systemctl enable stupid-apps.timer
+# Buddy is the system assistant: running quietly from login so Super+Space answers at once
+if [ -f /usr/share/stupid-buddy/stupid-buddy-autostart.desktop ]; then
+    ln -sf /usr/share/stupid-buddy/stupid-buddy-autostart.desktop /etc/xdg/autostart/stupid-buddy.desktop
+fi
 
 # The Stupid Browser is the default. Without it (no Linux release reachable) fall back to Firefox / GNOME Web.
 if dpkg -s stupid-browser >/dev/null 2>&1; then
