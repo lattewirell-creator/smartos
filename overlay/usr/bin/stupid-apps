@@ -1,0 +1,162 @@
+#!/usr/bin/python3 -I
+"""Stupid Apps: installs and updates The Stupid Company's apps on Stupid OS.
+
+  stupid-apps list              show the apps and their installed / latest versions
+  stupid-apps sync              install missing apps and update outdated ones (root)
+  stupid-apps sync --from DIR   install from local .deb files instead of GitHub (used by the ISO build)
+
+The app list comes from the Stupid OS repository, so a new app reaches every computer
+without a new Stupid OS release. The built-in copy is used when offline.
+"""
+import functools
+import glob
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import urllib.request
+
+MANIFEST_URL = "https://raw.githubusercontent.com/lattewirell-creator/smartos/main/config/stupid-apps.json"
+LOCAL_MANIFEST = "/usr/share/stupidos/stupid-apps.json"
+SUFFIX = "-linux-amd64.deb"
+CACHE = "/var/cache/stupid-apps"
+UA = {"User-Agent": "stupid-apps (Stupid OS)", "Accept": "application/vnd.github+json"}
+
+
+def fetch(url, timeout=30):
+    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r:
+        return r.read()
+
+
+def manifest():
+    try:
+        data = json.loads(fetch(MANIFEST_URL))
+        if isinstance(data.get("apps"), list):
+            return data["apps"]
+    except Exception as e:
+        print(f"Using the built-in app list ({e})", file=sys.stderr)
+    with open(LOCAL_MANIFEST) as f:
+        return json.load(f)["apps"]
+
+
+def installed_version(package):
+    r = subprocess.run(["dpkg-query", "-W", "-f=${Status}|${Version}", package], capture_output=True, text=True)
+    status, _, version = r.stdout.partition("|")
+    return version if r.returncode == 0 and status.endswith(" installed") else None
+
+
+def newer(candidate, current):
+    if not current:
+        return True
+    return subprocess.run(["dpkg", "--compare-versions", candidate, "gt", current]).returncode == 0
+
+
+def deb_version(path):
+    return subprocess.run(["dpkg-deb", "-f", path, "Version"], capture_output=True, text=True).stdout.strip()
+
+
+def latest_release(repo):
+    """The newest release's Linux package: (version, url, sha256 or None), or None if it has none."""
+    rel = json.loads(fetch(f"https://api.github.com/repos/{repo}/releases/latest"))
+    for asset in rel.get("assets", []):
+        if asset["name"].endswith(SUFFIX):
+            digest = asset.get("digest") or ""
+            sha = digest[7:] if digest.startswith("sha256:") else None
+            version = re.sub(r"^[^0-9]*", "", rel["tag_name"])
+            return version, asset["browser_download_url"], sha
+    return None
+
+
+def install(paths):
+    env = dict(os.environ, DEBIAN_FRONTEND="noninteractive")
+    cmd = ["apt-get", "install", "-y", "--no-install-recommends",
+           "-o", "Dpkg::Options::=--force-confdef", "-o", "Dpkg::Options::=--force-confold"]
+    return subprocess.run(cmd + [os.path.abspath(p) for p in paths], env=env).returncode == 0
+
+
+def sync_from_dir(apps, folder):
+    debs = []
+    for app in apps:
+        found = sorted(glob.glob(os.path.join(folder, f"*{SUFFIX}")))
+        found = [p for p in found
+                 if subprocess.run(["dpkg-deb", "-f", p, "Package"], capture_output=True, text=True).stdout.strip() == app["package"]]
+        if not found:
+            print(f"- {app['name']}: no local package, skipped")
+            continue
+        by_version = functools.cmp_to_key(lambda a, b: 1 if newer(deb_version(a), deb_version(b)) else -1)
+        best = max(found, key=by_version)
+        print(f"- {app['name']} {deb_version(best)}")
+        debs.append(best)
+    return install(debs) if debs else True
+
+
+def sync(apps):
+    os.makedirs(CACHE, exist_ok=True)
+    ok = True
+    for app in apps:
+        current = installed_version(app["package"])
+        try:
+            rel = latest_release(app["repo"])
+        except Exception as e:
+            print(f"- {app['name']}: could not check for updates ({e})")
+            ok = False
+            continue
+        if not rel:
+            print(f"- {app['name']}: no Linux version published yet")
+            continue
+        version, url, sha = rel
+        if not newer(version, current):
+            print(f"- {app['name']} {current}: up to date")
+            continue
+        print(f"- {app['name']}: {'updating ' + current if current else 'installing'} → {version}")
+        try:
+            data = fetch(url, timeout=600)
+            if sha and hashlib.sha256(data).hexdigest() != sha:
+                raise ValueError("checksum mismatch, download discarded")
+            with tempfile.NamedTemporaryFile(dir=CACHE, suffix=SUFFIX, delete=False) as f:
+                f.write(data)
+                path = f.name
+            os.chmod(path, 0o644)
+            if not install([path]):
+                raise RuntimeError("apt-get failed")
+        except Exception as e:
+            print(f"  failed: {e}")
+            ok = False
+        finally:
+            for p in glob.glob(os.path.join(CACHE, f"*{SUFFIX}")):
+                os.remove(p)
+    return ok
+
+
+def show(apps):
+    for app in apps:
+        current = installed_version(app["package"]) or "not installed"
+        try:
+            rel = latest_release(app["repo"])
+            latest = rel[0] if rel else "no Linux version yet"
+        except Exception:
+            latest = "unknown (offline?)"
+        print(f"{app['name']:<22} installed: {current:<16} latest: {latest}")
+
+
+def main(argv):
+    if not argv or argv[0] not in ("list", "sync"):
+        print(__doc__.strip())
+        return 2
+    apps = manifest()
+    if argv[0] == "list":
+        show(apps)
+        return 0
+    if os.geteuid() != 0:
+        print("Run as root: sudo stupid-apps sync", file=sys.stderr)
+        return 1
+    if len(argv) == 3 and argv[1] == "--from":
+        return 0 if sync_from_dir(apps, argv[2]) else 1
+    return 0 if sync(apps) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

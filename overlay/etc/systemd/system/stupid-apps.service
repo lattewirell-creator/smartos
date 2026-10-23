@@ -1,0 +1,10 @@
+[Unit]
+Description=Install and update The Stupid Company apps
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/stupid-apps sync
+Nice=10
+IOSchedulingClass=idle

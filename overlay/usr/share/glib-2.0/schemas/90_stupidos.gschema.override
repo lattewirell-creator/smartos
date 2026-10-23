@@ -1,4 +1,4 @@
-# SmartOS desktop defaults. Users can change all of these in Settings.
+# Stupid OS desktop defaults. Users can change all of these in Settings.
 
 [org.gnome.desktop.interface]
 gtk-theme='Yaru'
@@ -18,14 +18,14 @@ titlebar-font='Inter Semi-Bold 11'
 button-layout='appmenu:minimize,maximize,close'
 
 [org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-light.svg'
-picture-uri-dark='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+picture-uri='file:///usr/share/backgrounds/stupidos/wallpaper-light.svg'
+picture-uri-dark='file:///usr/share/backgrounds/stupidos/wallpaper-dark.svg'
 picture-options='zoom'
 primary-color='#FAF9F5'
 secondary-color='#EFEBE1'
 
 [org.gnome.desktop.screensaver]
-picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+picture-uri='file:///usr/share/backgrounds/stupidos/wallpaper-dark.svg'
 picture-options='zoom'
 primary-color='#1F1E1D'
 
@@ -36,12 +36,17 @@ theme-name='Yaru'
 tap-to-click=true
 natural-scroll=true
 
+[org.gnome.desktop.wm.keybindings]
+# Super+Space belongs to Buddy, keyboard layouts move one key over
+switch-input-source=['<Super><Alt>space', 'XF86Keyboard']
+switch-input-source-backward=['<Shift><Super><Alt>space', '<Shift>XF86Keyboard']
+
 [org.gnome.mutter]
 center-new-windows=true
 dynamic-workspaces=true
 
 [org.gnome.shell]
-favorite-apps=['smartos-install.desktop', '@BROWSER@', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Settings.desktop']
+favorite-apps=['stupidos-install.desktop', '@BROWSER@', 'stupid-mail.desktop', 'stupid-buddy.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
 enabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com']
 
 [org.gnome.shell.extensions.dash-to-dock]

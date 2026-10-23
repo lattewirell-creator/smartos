@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Install Stupid OS
+Name[sv]=Installera Stupid OS
+Comment=Install Stupid OS on this computer
+Comment[sv]=Installera Stupid OS på den här datorn
+Exec=stupidos-install
+Icon=stupidos
+Terminal=false
+Categories=System;
+OnlyShowIn=GNOME;

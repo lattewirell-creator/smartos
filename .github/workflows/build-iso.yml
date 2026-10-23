@@ -1,4 +1,4 @@
-name: Build SmartOS ISO
+name: Build Stupid OS ISO
 
 on:
   workflow_dispatch:
@@ -19,19 +19,19 @@ jobs:
           df -h /
 
       - name: Build ISO
-        run: sudo WORK=/mnt/smartos-work ./build.sh
+        run: sudo WORK=/mnt/stupidos-work ./build.sh
 
       - name: Split ISO for the release (GitHub caps files at 2 GB)
         run: |
           cd out
           sudo chown -R "$USER" .
-          split -b 1900M -d -a 2 SmartOS-*-amd64.iso "$(ls SmartOS-*-amd64.iso).part"
+          split -b 1900M -d -a 2 StupidOS-*-amd64.iso "$(ls StupidOS-*-amd64.iso).part"
           ls -lh
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: smartos-iso
+          name: stupidos-iso
           path: out/*.iso.part*
           retention-days: 14
 

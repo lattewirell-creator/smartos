@@ -1,0 +1,26 @@
+{
+  "comment": "The Stupid Company apps that Stupid OS installs and keeps updated. Add a new app here and every Stupid OS computer picks it up on its next daily check. Each app's GitHub release must carry a file ending in -linux-amd64.deb.",
+  "apps": [
+    {
+      "id": "stupid-browser",
+      "name": "The Stupid Browser",
+      "repo": "lattewirell-creator/stupid-browser",
+      "package": "stupid-browser",
+      "desktop": "stupid-browser.desktop"
+    },
+    {
+      "id": "stupid-mail",
+      "name": "The Stupid Mail",
+      "repo": "lattewirell-creator/stupid-mail",
+      "package": "stupid-mail",
+      "desktop": "stupid-mail.desktop"
+    },
+    {
+      "id": "stupid-buddy",
+      "name": "The Stupid Buddy",
+      "repo": "lattewirell-creator/stupid-buddy",
+      "package": "stupid-buddy",
+      "desktop": "stupid-buddy.desktop"
+    }
+  ]
+}

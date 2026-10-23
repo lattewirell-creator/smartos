@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for new versions of The Stupid Company apps every day
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1d
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

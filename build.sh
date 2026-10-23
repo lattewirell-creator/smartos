@@ -1,24 +1,27 @@
 #!/bin/bash
-# Builds the SmartOS live/installer ISO.
+# Builds the Stupid OS live/installer ISO.
 #
 #   sudo ./build.sh            full build
 #   sudo ./build.sh --iso-only reuse the existing root filesystem, just repack the ISO
+#
+#   STUPID_APPS_DIR=/path/to/debs sudo -E ./build.sh
+#       preinstall The Stupid Company apps from local .deb files instead of their GitHub releases
 #
 # Needs an Ubuntu 24.04 (or newer) host with about 25 GB free disk.
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$ROOT_DIR/config/smartos.conf"
-WORK="${WORK:-/var/tmp/smartos-work}"
+source "$ROOT_DIR/config/stupidos.conf"
+WORK="${WORK:-/var/tmp/stupidos-work}"
 CHROOT="$WORK/chroot"
 ISO_DIR="$WORK/iso"
 OUT_DIR="${OUT_DIR:-$ROOT_DIR/out}"
-ISO_NAME="SmartOS-${DISTRO_VERSION}-amd64.iso"
+ISO_NAME="StupidOS-${DISTRO_VERSION}-amd64.iso"
 ISO_ONLY=false
 [ "${1:-}" = "--iso-only" ] && ISO_ONLY=true
 
-log() { echo -e "\n\033[1;32m[smartos] $*\033[0m"; }
-die() { echo -e "\033[1;31m[smartos] $*\033[0m" >&2; exit 1; }
+log() { echo -e "\n\033[1;32m[stupidos] $*\033[0m"; }
+die() { echo -e "\033[1;31m[stupidos] $*\033[0m" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || die "Run as root: sudo ./build.sh"
 
@@ -48,21 +51,22 @@ render_branding() {
     local B="$ROOT_DIR/branding" S="$WORK/stage"
     rm -rf "$S" && mkdir -p "$S"
     cp -a "$ROOT_DIR/overlay/." "$S/"
+    install -Dm644 "$ROOT_DIR/config/stupid-apps.json" "$S/usr/share/stupidos/stupid-apps.json"
 
-    install -Dm644 "$B/wallpaper-light.svg" "$S/usr/share/backgrounds/smartos/wallpaper-light.svg"
-    install -Dm644 "$B/wallpaper-dark.svg"  "$S/usr/share/backgrounds/smartos/wallpaper-dark.svg"
-    install -Dm644 "$B/logo.svg" "$S/usr/share/icons/hicolor/scalable/apps/smartos.svg"
+    install -Dm644 "$B/wallpaper-light.svg" "$S/usr/share/backgrounds/stupidos/wallpaper-light.svg"
+    install -Dm644 "$B/wallpaper-dark.svg"  "$S/usr/share/backgrounds/stupidos/wallpaper-dark.svg"
+    install -Dm644 "$B/logo.svg" "$S/usr/share/icons/hicolor/scalable/apps/stupidos.svg"
     for s in 16 24 32 48 64 128 256 512; do
         mkdir -p "$S/usr/share/icons/hicolor/${s}x${s}/apps"
-        rsvg-convert -w $s -h $s "$B/logo.svg" -o "$S/usr/share/icons/hicolor/${s}x${s}/apps/smartos.png"
+        rsvg-convert -w $s -h $s "$B/logo.svg" -o "$S/usr/share/icons/hicolor/${s}x${s}/apps/stupidos.png"
     done
     mkdir -p "$S/usr/share/pixmaps"
-    rsvg-convert -w 256 "$B/logo.svg" -o "$S/usr/share/pixmaps/smartos-logo.png"
+    rsvg-convert -w 256 "$B/logo.svg" -o "$S/usr/share/pixmaps/stupidos-logo.png"
 
     # Wordmarks: logo + name, light text for dark backgrounds
     local wm="$WORK/wordmark.svg"
     cat > "$wm" <<EOF
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="200" viewBox="0 0 760 200">
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="200" viewBox="0 0 880 200">
   <g transform="translate(0,4) scale(0.375)">
     <rect x="16" y="16" width="480" height="480" rx="112" fill="#D97757"/>
     <path d="M 322 186 A 66 66 0 1 0 256 256 A 66 66 0 1 1 190 326" fill="none" stroke="#FAF9F5" stroke-width="46" stroke-linecap="round"/>
@@ -70,23 +74,23 @@ render_branding() {
   <text x="228" y="132" font-family="Inter" font-weight="600" font-size="112" letter-spacing="-2" fill="#ECE9E1">${DISTRO_NAME}</text>
 </svg>
 EOF
-    rsvg-convert -w 380 "$wm" -o "$S/usr/share/pixmaps/smartos-wordmark.png"
-    rsvg-convert -w 228 "$wm" -o "$S/usr/share/pixmaps/smartos-wordmark-small.png"
+    rsvg-convert -w 380 "$wm" -o "$S/usr/share/pixmaps/stupidos-wordmark.png"
+    rsvg-convert -w 228 "$wm" -o "$S/usr/share/pixmaps/stupidos-wordmark-small.png"
 
     # Boot splash: dark warm background, wordmark in the middle, spinner below
-    local P="$S/usr/share/plymouth/themes/smartos"
+    local P="$S/usr/share/plymouth/themes/stupidos"
     mkdir -p "$P"
-    cp "$S/usr/share/pixmaps/smartos-wordmark.png" "$P/watermark.png"
-    cat > "$P/smartos.plymouth" <<'EOF'
+    cp "$S/usr/share/pixmaps/stupidos-wordmark.png" "$P/watermark.png"
+    cat > "$P/stupidos.plymouth" <<'EOF'
 [Plymouth Theme]
-Name=SmartOS
-Description=SmartOS boot splash
+Name=Stupid OS
+Description=Stupid OS boot splash
 ModuleName=two-step
 
 [two-step]
 Font=Inter 12
 TitleFont=Inter Light 24
-ImageDir=/usr/share/plymouth/themes/smartos
+ImageDir=/usr/share/plymouth/themes/stupidos
 DialogHorizontalAlignment=.5
 DialogVerticalAlignment=.382
 TitleHorizontalAlignment=.5
@@ -133,7 +137,7 @@ SubTitle=Stäng inte av datorn
 EOF
 
     # Installer images
-    local CB="$S/etc/calamares/branding/smartos"
+    local CB="$S/etc/calamares/branding/stupidos"
     rsvg-convert -w 128 "$B/logo.svg" -o "$CB/logo.png"
     rsvg-convert -w 128 "$B/logo.svg" -o "$CB/icon.png"
     local welcome="$WORK/welcome.svg"
@@ -149,17 +153,22 @@ build_rootfs() {
     fi
     render_branding
     mount_chroot
-    rm -rf "$CHROOT/tmp/smartos" && mkdir -p "$CHROOT/tmp/smartos"
-    cp -a "$ROOT_DIR/config" "$CHROOT/tmp/smartos/"
-    cp -a "$WORK/stage" "$CHROOT/tmp/smartos/overlay"
-    cp "$ROOT_DIR/scripts/chroot-setup.sh" "$CHROOT/tmp/smartos/"
+    rm -rf "$CHROOT/tmp/stupidos" && mkdir -p "$CHROOT/tmp/stupidos"
+    cp -a "$ROOT_DIR/config" "$CHROOT/tmp/stupidos/"
+    cp -a "$WORK/stage" "$CHROOT/tmp/stupidos/overlay"
+    cp "$ROOT_DIR/scripts/chroot-setup.sh" "$CHROOT/tmp/stupidos/"
+    # Optional local app packages (*-linux-amd64.deb); without them the apps come from GitHub releases
+    mkdir -p "$CHROOT/tmp/stupidos/apps"
+    if [ -d "${STUPID_APPS_DIR:-}" ]; then
+        cp "$STUPID_APPS_DIR"/*-linux-amd64.deb "$CHROOT/tmp/stupidos/apps/" 2>/dev/null || true
+    fi
     [ -L "$CHROOT/etc/resolv.conf" ] && rm -f "$CHROOT/etc/resolv.conf"
     cp -L /etc/resolv.conf "$CHROOT/etc/resolv.conf"
     # Pass the build host's proxy (if any) into the chroot
     chroot "$CHROOT" /usr/bin/env -i HOME=/root PATH=/usr/sbin:/usr/bin:/sbin:/bin TERM="${TERM:-xterm}" \
         http_proxy="${http_proxy:-}" https_proxy="${https_proxy:-}" HTTP_PROXY="${HTTP_PROXY:-}" HTTPS_PROXY="${HTTPS_PROXY:-}" \
         no_proxy="${no_proxy:-}" \
-        /bin/bash /tmp/smartos/chroot-setup.sh
+        /bin/bash /tmp/stupidos/chroot-setup.sh
     rm -f "$CHROOT/etc/resolv.conf"
     ln -sf ../run/systemd/resolve/stub-resolv.conf "$CHROOT/etc/resolv.conf"
     umount_chroot
@@ -190,7 +199,7 @@ build_iso() {
     echo "${DISTRO_NAME} ${DISTRO_VERSION} \"${DISTRO_CODENAME}\" - Release amd64 (${stamp})" > "$ISO_DIR/.disk/info"
     echo "full_cd/single" > "$ISO_DIR/.disk/cd_type"
     touch "$ISO_DIR/.disk/base_installable"
-    echo "https://github.com/" > "$ISO_DIR/.disk/release_notes_url"
+    echo "https://thestupidcompany.net" > "$ISO_DIR/.disk/release_notes_url"
 
     cat > "$ISO_DIR/boot/grub/grub.cfg" <<EOF
 set timeout=5
@@ -259,7 +268,7 @@ EOF
     rm -f "$OUT_DIR/$ISO_NAME"
     xorriso -as mkisofs \
         -iso-level 3 -full-iso9660-filenames -joliet -joliet-long -rational-rock \
-        -volid "SMARTOS_${DISTRO_VERSION//./_}" \
+        -volid "STUPIDOS_${DISTRO_VERSION//./_}" \
         -output "$OUT_DIR/$ISO_NAME" \
         --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
         -partition_offset 16 \

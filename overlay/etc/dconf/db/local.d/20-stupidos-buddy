@@ -1,0 +1,8 @@
+# Super+Space opens Buddy, the Stupid OS assistant (like Siri or Spotlight)
+[org/gnome/settings-daemon/plugins/media-keys]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/buddy/']
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/buddy]
+name='Buddy'
+command='stupid-buddy --summon'
+binding='<Super>space'

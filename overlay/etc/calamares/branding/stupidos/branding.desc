@@ -1,5 +1,5 @@
 ---
-componentName: smartos
+componentName: stupidos
 welcomeStyleCalamares: false
 welcomeExpandingLogo: true
 windowExpanding: normal
@@ -9,15 +9,15 @@ sidebar: widget
 navigation: widget
 
 strings:
-    productName:         SmartOS
-    shortProductName:    SmartOS
+    productName:         Stupid OS
+    shortProductName:    Stupid OS
     version:             1.0
     shortVersion:        1.0
-    versionedName:       SmartOS 1.0
-    shortVersionedName:  SmartOS 1.0
-    bootloaderEntryName: SmartOS
-    productUrl:          https://github.com/
-    supportUrl:          https://help.ubuntu.com/
+    versionedName:       Stupid OS 1.0
+    shortVersionedName:  Stupid OS 1.0
+    bootloaderEntryName: Stupid OS
+    productUrl:          https://thestupidcompany.net
+    supportUrl:          https://github.com/lattewirell-creator/smartos/issues
 
 images:
     productLogo:         "logo.png"

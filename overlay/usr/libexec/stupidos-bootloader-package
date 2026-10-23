@@ -1,7 +1,7 @@
 #!/bin/sh
 # Called by the installer inside the target system, after GRUB is installed.
 # The live image ships grub-efi-amd64. On BIOS machines we switch to grub-pc
-# (shipped offline in /opt/smartos/debs) so future kernel updates refresh GRUB.
+# (shipped offline in /opt/stupidos/debs) so future kernel updates refresh GRUB.
 export DEBIAN_FRONTEND=noninteractive
 set -x
 if [ ! -d /sys/firmware/efi ]; then
@@ -14,8 +14,8 @@ if [ ! -d /sys/firmware/efi ]; then
     if [ -n "$disk" ]; then
         echo "grub-pc grub-pc/install_devices multiselect /dev/$disk" | debconf-set-selections
     fi
-    apt-get -y install --allow-remove-essential /opt/smartos/debs/*.deb || dpkg -i --auto-deconfigure /opt/smartos/debs/*.deb || true
+    apt-get -y install --allow-remove-essential /opt/stupidos/debs/*.deb || dpkg -i --auto-deconfigure /opt/stupidos/debs/*.deb || true
 fi
-rm -rf /opt/smartos/debs
+rm -rf /opt/stupidos/debs
 update-grub || true
 exit 0

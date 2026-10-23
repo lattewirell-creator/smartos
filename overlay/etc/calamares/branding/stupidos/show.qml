@@ -37,7 +37,7 @@ Presentation {
     }
 
     Card {
-        title: qsTr("Välkommen till SmartOS")
+        title: qsTr("Välkommen till Stupid OS")
         body: qsTr("Ett lugnt och snabbt operativsystem byggt på Ubuntu 24.04 LTS. Säkerhetsuppdateringar ingår till 2029.")
     }
     Card {
@@ -50,6 +50,6 @@ Presentation {
     }
     Card {
         title: qsTr("Dina drivrutiner, automatiskt")
-        body: qsTr("SmartOS hittar drivrutiner för grafik, wifi och skrivare själv. Grafikkort från NVIDIA hittar du under Programvara och uppdateringar.")
+        body: qsTr("Stupid OS hittar drivrutiner för grafik, wifi och skrivare själv. Grafikkort från NVIDIA hittar du under Programvara och uppdateringar.")
     }
 }

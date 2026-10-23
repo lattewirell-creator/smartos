@@ -1,8 +1,8 @@
 #!/bin/bash
-# Runs inside the SmartOS root filesystem. Called by build.sh, never by hand.
+# Runs inside the Stupid OS root filesystem. Called by build.sh, never by hand.
 set -euo pipefail
 
-source /tmp/smartos/config/smartos.conf
+source /tmp/stupidos/config/stupidos.conf
 export DEBIAN_FRONTEND=noninteractive
 export LANG=C.UTF-8
 APT_OPTS=(-y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
@@ -25,7 +25,7 @@ Components: main restricted universe multiverse
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
 
-# SmartOS uses Flatpak instead of Snap. Keep snapd out for good.
+# Stupid OS uses Flatpak instead of Snap. Keep snapd out for good.
 cat > /etc/apt/preferences.d/no-snap.pref <<'EOF'
 Package: snapd
 Pin: release a=*
@@ -62,41 +62,15 @@ EOF
 echo "keyboard-configuration keyboard-configuration/layoutcode string ${LIVE_KEYMAP}" | debconf-set-selections
 
 log "Installing packages (this is the long part)"
-mapfile -t PKGS < <(grep -vE '^\s*(#|$)' /tmp/smartos/config/packages.list)
+mapfile -t PKGS < <(grep -vE '^\s*(#|$)' /tmp/stupidos/config/packages.list)
 apt-get "${APT_OPTS[@]}" install --no-install-recommends "${PKGS[@]}"
 
-log "Web browser"
-BROWSER_DESKTOP="org.gnome.Epiphany.desktop"
-if curl -fsSL --max-time 30 https://packages.mozilla.org/apt/repo-signing-key.gpg -o /tmp/mozilla.gpg; then
-    install -d -m 0755 /etc/apt/keyrings
-    gpg --dearmor < /tmp/mozilla.gpg > /etc/apt/keyrings/packages.mozilla.org.gpg 2>/dev/null \
-        || cp /tmp/mozilla.gpg /etc/apt/keyrings/packages.mozilla.org.asc
-    KEY=$(ls /etc/apt/keyrings/packages.mozilla.org.* | head -1)
-    cat > /etc/apt/sources.list.d/mozilla.sources <<EOF
-Types: deb
-URIs: https://packages.mozilla.org/apt
-Suites: mozilla
-Components: main
-Signed-By: ${KEY}
-EOF
-    cat > /etc/apt/preferences.d/mozilla.pref <<'EOF'
-Package: *
-Pin: origin packages.mozilla.org
-Pin-Priority: 1000
-EOF
-    apt-get update
-    apt-get "${APT_OPTS[@]}" install --no-install-recommends firefox firefox-l10n-sv-se
-    BROWSER_DESKTOP="firefox.desktop"
-else
-    echo "Mozilla's repository is unreachable, installing GNOME Web instead."
-    apt-get "${APT_OPTS[@]}" install --no-install-recommends epiphany-browser
-fi
 apt-get "${APT_OPTS[@]}" purge snapd 2>/dev/null || true
 
 # Debs the installer uses to switch the bootloader package on BIOS machines
 log "Offline bootloader packages"
-mkdir -p /opt/smartos/debs
-(cd /opt/smartos/debs && apt-get download grub-pc grub-gfxpayload-lists)
+mkdir -p /opt/stupidos/debs
+(cd /opt/stupidos/debs && apt-get download grub-pc grub-gfxpayload-lists)
 
 log "Branding: identity"
 OS_RELEASE_TEXT="NAME=\"${DISTRO_NAME}\"
@@ -107,10 +81,10 @@ PRETTY_NAME=\"${DISTRO_NAME} ${DISTRO_VERSION}\"
 VERSION_ID=\"${DISTRO_VERSION}\"
 VERSION_CODENAME=${UBUNTU_CODENAME}
 UBUNTU_CODENAME=${UBUNTU_CODENAME}
-LOGO=smartos
-HOME_URL=\"https://github.com/\"
-SUPPORT_URL=\"https://help.ubuntu.com/\"
-BUG_REPORT_URL=\"https://github.com/\""
+LOGO=stupidos
+HOME_URL=\"https://thestupidcompany.net\"
+SUPPORT_URL=\"https://thestupidcompany.net\"
+BUG_REPORT_URL=\"https://github.com/lattewirell-creator/smartos/issues\""
 # Divert so base-files upgrades never overwrite our identity
 for f in /usr/lib/os-release /etc/lsb-release /etc/issue /etc/issue.net; do
     dpkg-divert --quiet --local --rename --add "$f"
@@ -118,7 +92,7 @@ done
 echo "$OS_RELEASE_TEXT" > /usr/lib/os-release
 ln -sf ../usr/lib/os-release /etc/os-release
 cat > /etc/lsb-release <<EOF
-DISTRIB_ID=${DISTRO_NAME}
+DISTRIB_ID="${DISTRO_NAME}"
 DISTRIB_RELEASE=${DISTRO_VERSION}
 DISTRIB_CODENAME=${UBUNTU_CODENAME}
 DISTRIB_DESCRIPTION="${DISTRO_NAME} ${DISTRO_VERSION}"
@@ -129,30 +103,79 @@ echo "${DISTRO_NAME} ${DISTRO_VERSION}" > /etc/issue.net
 chmod -x /etc/update-motd.d/* 2>/dev/null || true
 
 log "Branding: files"
-cp -a /tmp/smartos/overlay/. /
-chmod +x /usr/bin/smartos-install /usr/libexec/smartos-* 2>/dev/null || true
+cp -a /tmp/stupidos/overlay/. /
+chmod +x /usr/bin/stupidos-install /usr/bin/stupid-apps /usr/libexec/stupidos-* 2>/dev/null || true
+
+log "The Stupid Company apps"
+# Local packages from the build host win (used before the apps publish Linux releases);
+# otherwise fetch the latest releases from GitHub. Either way this never fails the build.
+if ls /tmp/stupidos/apps/*-linux-amd64.deb >/dev/null 2>&1; then
+    stupid-apps sync --from /tmp/stupidos/apps || echo "WARNING: some Stupid apps failed to install"
+else
+    stupid-apps sync || echo "WARNING: some Stupid apps failed to install"
+fi
+systemctl enable stupid-apps.timer
+
+# The Stupid Browser is the default. Without it (no Linux release reachable) fall back to Firefox / GNOME Web.
+if dpkg -s stupid-browser >/dev/null 2>&1; then
+    BROWSER_DESKTOP="stupid-browser.desktop"
+else
+    log "Fallback web browser"
+    BROWSER_DESKTOP="org.gnome.Epiphany.desktop"
+    if curl -fsSL --max-time 30 https://packages.mozilla.org/apt/repo-signing-key.gpg -o /tmp/mozilla.gpg; then
+        install -d -m 0755 /etc/apt/keyrings
+        gpg --dearmor < /tmp/mozilla.gpg > /etc/apt/keyrings/packages.mozilla.org.gpg 2>/dev/null \
+            || cp /tmp/mozilla.gpg /etc/apt/keyrings/packages.mozilla.org.asc
+        KEY=$(ls /etc/apt/keyrings/packages.mozilla.org.* | head -1)
+        cat > /etc/apt/sources.list.d/mozilla.sources <<EOF
+Types: deb
+URIs: https://packages.mozilla.org/apt
+Suites: mozilla
+Components: main
+Signed-By: ${KEY}
+EOF
+        cat > /etc/apt/preferences.d/mozilla.pref <<'EOF'
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+EOF
+        apt-get update
+        apt-get "${APT_OPTS[@]}" install --no-install-recommends firefox firefox-l10n-sv-se
+        BROWSER_DESKTOP="firefox.desktop"
+    else
+        echo "Mozilla's repository is unreachable, installing GNOME Web instead."
+        apt-get "${APT_OPTS[@]}" install --no-install-recommends epiphany-browser
+    fi
+fi
 
 # Default browser and dock favourites depend on which browser we got
-sed -i "s/@BROWSER@/${BROWSER_DESKTOP}/" /usr/share/glib-2.0/schemas/90_smartos.gschema.override
+sed -i "s/@BROWSER@/${BROWSER_DESKTOP}/" /usr/share/glib-2.0/schemas/90_stupidos.gschema.override
 xdg_mime_default() { echo "$2=$1"; }
 {
     echo "[Default Applications]"
     for t in x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml; do
         xdg_mime_default "$BROWSER_DESKTOP" "$t"
     done
-} > /usr/share/applications/smartos-mimeapps.list
-mkdir -p /etc/xdg && cp /usr/share/applications/smartos-mimeapps.list /etc/xdg/mimeapps.list
+    if dpkg -s stupid-mail >/dev/null 2>&1; then xdg_mime_default stupid-mail.desktop x-scheme-handler/mailto; fi
+} > /usr/share/applications/stupidos-mimeapps.list
+mkdir -p /etc/xdg && cp /usr/share/applications/stupidos-mimeapps.list /etc/xdg/mimeapps.list
 glib-compile-schemas /usr/share/glib-2.0/schemas
+
+# System-wide GNOME settings that need dconf (custom shortcuts can't live in a schema override)
+dconf update
 
 # GDM login screen
 if [ -d /usr/share/gdm/dconf ]; then
     dconf compile /usr/share/gdm/greeter-dconf-defaults /usr/share/gdm/dconf
 fi
 
-# Boot splash
+# Boot splash: reuse the spinner animation, keep our own watermark
+for f in /usr/share/plymouth/themes/spinner/*.png; do
+    [ "$(basename "$f")" = watermark.png ] || cp -n "$f" /usr/share/plymouth/themes/stupidos/
+done
 update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth \
-    /usr/share/plymouth/themes/smartos/smartos.plymouth 200
-update-alternatives --set default.plymouth /usr/share/plymouth/themes/smartos/smartos.plymouth
+    /usr/share/plymouth/themes/stupidos/stupidos.plymouth 200
+update-alternatives --set default.plymouth /usr/share/plymouth/themes/stupidos/stupidos.plymouth
 
 # GRUB on the installed system
 sed -i -e 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=hidden/' \
@@ -161,7 +184,7 @@ sed -i -e 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=hidden/' \
 grep -q '^GRUB_DISABLE_OS_PROBER' /etc/default/grub || echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub
 
 log "Services"
-systemctl enable smartos-flathub.service NetworkManager.service gdm3.service 2>/dev/null || systemctl enable smartos-flathub.service NetworkManager.service
+systemctl enable stupidos-flathub.service NetworkManager.service gdm3.service 2>/dev/null || systemctl enable stupidos-flathub.service NetworkManager.service
 systemctl set-default graphical.target
 
 log "Live session settings"

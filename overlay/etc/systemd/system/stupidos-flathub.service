@@ -1,5 +1,5 @@
 [Unit]
-Description=Add the Flathub app store to SmartOS
+Description=Add the Flathub app store to Stupid OS
 Wants=network-online.target
 After=network-online.target
 ConditionPathExists=!/var/lib/flatpak/repo/flathub.trustedkeys.gpg

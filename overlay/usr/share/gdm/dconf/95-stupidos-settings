@@ -1,5 +1,5 @@
 [org/gnome/login-screen]
-logo='/usr/share/pixmaps/smartos-wordmark-small.png'
+logo='/usr/share/pixmaps/stupidos-wordmark-small.png'
 
 [org/gnome/desktop/interface]
 font-name='Inter 11'
@@ -8,5 +8,5 @@ icon-theme='Yaru'
 cursor-theme='Yaru'
 
 [org/gnome/desktop/background]
-picture-uri='file:///usr/share/backgrounds/smartos/wallpaper-dark.svg'
+picture-uri='file:///usr/share/backgrounds/stupidos/wallpaper-dark.svg'
 primary-color='#1F1E1D'
