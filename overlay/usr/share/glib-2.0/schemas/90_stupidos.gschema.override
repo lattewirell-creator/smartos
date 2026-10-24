@@ -187,3 +187,7 @@ dshadow=true
 mshcolor=['0.0', '0.0', '0.0']
 dark-mshcolor=['0.0', '0.0', '0.0']
 mshalpha=0.35
+# Accent for selections, sliders and the focused app's dot in the dock (Open Bar's default is cyan)
+mscolor=['0.851', '0.467', '0.341']
+dark-mscolor=['0.851', '0.467', '0.341']
+light-mscolor=['0.851', '0.467', '0.341']
