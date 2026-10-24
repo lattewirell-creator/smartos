@@ -45,7 +45,6 @@ fwupd
 gnome-shell
 gnome-session
 gdm3
-gnome-shell-extension-ubuntu-dock
 gnome-shell-extension-appindicator
 gnome-control-center
 gnome-settings-daemon

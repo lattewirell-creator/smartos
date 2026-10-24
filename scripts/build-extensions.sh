@@ -1,6 +1,6 @@
 #!/bin/bash
 # Builds the GNOME Shell extensions behind the Stupid OS look (tiling with gaps, blur,
-# rounded corners, floating bar) from source at pinned versions, into a system-wide tree.
+# rounded corners, floating bar, a macOS-style dock) from source at pinned versions, into a system-wide tree.
 #
 #   scripts/build-extensions.sh STAGE_DIR
 #
@@ -21,6 +21,7 @@ blur-my-shell|https://github.com/aunetx/blur-my-shell|v76|blur-my-shell@aunetx
 forge|https://github.com/forge-ext/forge|v49-89|forge@jmmaranan.com
 rounded-window-corners|https://github.com/flexagoon/rounded-window-corners|12|rounded-window-corners@fxgn
 openbar|https://github.com/neuromorph/openbar|01fb24217e|openbar@neuromorph
+dash2dock|https://github.com/icedman/dash2dock-lite|v50.1|dash2dock-lite@icedman.github.com
 "
 
 fetch() {  # name url ref
@@ -102,28 +103,13 @@ PY
             ;;
         openbar)
             cp -r "$src/openbar@neuromorph/." "$out/"
-            # Lift the dock's glass off the screen edge so it floats like the bar's islands
-            python3 - "$out/stylesheets.js" <<'PY'
-import sys
-path = sys.argv[1]
-js = open(path).read()
-anchor = "        #dash StIcon {"
-assert js.count(anchor) == 1, "openbar: dash anchor not found"
-lift = """        #dashtodockContainer.bottom #dash .dash-background {
-            margin-bottom: 10px !important;
-        }
-        #dashtodockContainer.bottom #dash .dash-item-container .app-well-app,
-        #dashtodockContainer.bottom #dash .dash-item-container .show-apps,
-        #dashtodockContainer.bottom #dash .dash-item-container .overview-tile {
-            padding-top: 8px !important;
-            padding-bottom: 20px !important;
-        }
-        #dashtodockContainer.bottom #dash .app-well-app-running-dot {
-            margin-bottom: 13px !important;
-        }
-"""
-open(path, "w").write(js.replace(anchor, lift + anchor))
-PY
+            ;;
+        dash2dock)
+            # What their `make install` copies, minus the dev files
+            cp -r "$src"/. "$out/"
+            rm -rf "$out"/{.git,.github,build,tests,tools,screenshots,docs,agents,node_modules} \
+                   "$out"/{Makefile,install.sh,eslint.config.js,package.json,package-lock.json,schemas/gschemas.compiled}
+            rm -f "$out"/*.md
             ;;
     esac
     globalize_schemas "$out"

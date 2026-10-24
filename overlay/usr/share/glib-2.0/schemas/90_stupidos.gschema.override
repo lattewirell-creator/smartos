@@ -47,28 +47,41 @@ dynamic-workspaces=true
 
 [org.gnome.shell]
 favorite-apps=['stupidos-install.desktop', '@BROWSER@', 'stupid-mail.desktop', 'stupid-buddy.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
-enabled-extensions=['ubuntu-dock@ubuntu.com', 'ubuntu-appindicators@ubuntu.com', 'forge@jmmaranan.com', 'blur-my-shell@aunetx', 'rounded-window-corners@fxgn', 'openbar@neuromorph']
+enabled-extensions=['dash2dock-lite@icedman.github.com', 'ubuntu-appindicators@ubuntu.com', 'forge@jmmaranan.com', 'blur-my-shell@aunetx', 'rounded-window-corners@fxgn', 'openbar@neuromorph']
 
-[org.gnome.shell.extensions.dash-to-dock]
-dock-position='BOTTOM'
-extend-height=false
-dock-fixed=false
-autohide=true
-intellihide=true
-intellihide-mode='FOCUS_APPLICATION_WINDOWS'
-dash-max-icon-size=48
-icon-size-fixed=true
-show-trash=false
-show-mounts=false
-show-apps-at-top=false
-always-center-icons=true
-running-indicator-style='DOTS'
-click-action='minimize-or-previews'
-height-fraction=0.9
-animation-time=0.25
-# The floating glass look itself comes from Open Bar (dashdock-style below), which needs the dock's built-in theme
-apply-custom-theme=true
-custom-theme-shrink=false
+# The dock, macOS style: icons magnify under the pointer, apps bounce as they open, windows
+# minimise with a magic-lamp effect, one dot under running apps, Trash at the far end.
+# Dark frosted glass with a terracotta edge to match the island bar; it floats just off the edge
+# and slides away when a window needs the space.
+[org.gnome.shell.extensions.dash2dock-lite]
+dock-location=0
+icon-size=0.17
+edge-distance=1.0
+dock-padding=0.4
+icon-spacing=0.4
+shrink-icons=true
+animate-icons=true
+animation-magnify=0.5
+animation-spread=0.6
+animation-rise=0.3
+open-app-animation=true
+lamp-app-animation=true
+autohide-dash=true
+autohide-dodge=true
+apps-icon=true
+apps-icon-front=false
+trash-icon=true
+icon-shadow=true
+blur-background=true
+background-color=(0.122, 0.118, 0.114, 0.6)
+border-radius=5.0
+border-thickness=1
+border-color=(0.851, 0.467, 0.341, 0.55)
+separator-thickness=1
+separator-color=(0.925, 0.914, 0.882, 0.2)
+running-indicator-style=2
+running-indicator-color=(0.851, 0.467, 0.341, 1.0)
+notification-badge-color=(0.851, 0.467, 0.341, 1.0)
 
 [org.gnome.nautilus.preferences]
 default-folder-viewer='icon-view'
@@ -128,16 +141,9 @@ move-to-monitor-down=[]
 close=['<Super>q', '<Alt>F4']
 toggle-fullscreen=['<Super>f']
 
-# The island bar owns the top panel; Blur my Shell does the overview, dock and app grid
+# The island bar owns the top panel and the dock blurs itself; Blur my Shell does the overview and app grid
 [org.gnome.shell.extensions.blur-my-shell.panel]
 blur=false
-
-[org.gnome.shell.extensions.blur-my-shell.dash-to-dock]
-blur=true
-override-background=false
-customize=true
-sigma=30
-brightness=0.75
 
 # Buddy's ball is a transparent round window: no rounded-corner frame or shadow around it
 [org.gnome.shell.extensions.rounded-window-corners-reborn]
@@ -175,19 +181,7 @@ mbgalpha=0.92
 apply-menu-shell=true
 apply-accent-shell=true
 color-scheme='prefer-dark'
-# The dock: a floating glass island in the same style as the bar, with a terracotta edge
-dashdock-style='Custom'
-dbgcolor=['0.122', '0.118', '0.114']
-dark-dbgcolor=['0.122', '0.118', '0.114']
-dbgalpha=0.6
-dbradius=22.0
-disize=42.0
-dborder=true
-dshadow=true
-mshcolor=['0.0', '0.0', '0.0']
-dark-mshcolor=['0.0', '0.0', '0.0']
-mshalpha=0.35
-# Accent for selections, sliders and the focused app's dot in the dock (Open Bar's default is cyan)
+# Accent for selections and sliders (Open Bar's default is cyan)
 mscolor=['0.851', '0.467', '0.341']
 dark-mscolor=['0.851', '0.467', '0.341']
 light-mscolor=['0.851', '0.467', '0.341']
