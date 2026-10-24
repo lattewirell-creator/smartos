@@ -56,16 +56,19 @@ dock-fixed=false
 autohide=true
 intellihide=true
 intellihide-mode='FOCUS_APPLICATION_WINDOWS'
-dash-max-icon-size=44
+dash-max-icon-size=48
+icon-size-fixed=true
 show-trash=false
 show-mounts=false
 show-apps-at-top=false
-transparency-mode='FIXED'
-background-opacity=0.75
-custom-background-color=false
+always-center-icons=true
 running-indicator-style='DOTS'
 click-action='minimize-or-previews'
 height-fraction=0.9
+animation-time=0.25
+# The floating glass look itself comes from Open Bar (dashdock-style below), which needs the dock's built-in theme
+apply-custom-theme=true
+custom-theme-shrink=false
 
 [org.gnome.nautilus.preferences]
 default-folder-viewer='icon-view'
@@ -131,7 +134,10 @@ blur=false
 
 [org.gnome.shell.extensions.blur-my-shell.dash-to-dock]
 blur=true
-style-dash-to-dock=1
+override-background=false
+customize=true
+sigma=30
+brightness=0.75
 
 # Buddy's ball is a transparent round window: no rounded-corner frame or shadow around it
 [org.gnome.shell.extensions.rounded-window-corners-reborn]
@@ -169,3 +175,15 @@ mbgalpha=0.92
 apply-menu-shell=true
 apply-accent-shell=true
 color-scheme='prefer-dark'
+# The dock: a floating glass island in the same style as the bar, with a terracotta edge
+dashdock-style='Custom'
+dbgcolor=['0.122', '0.118', '0.114']
+dark-dbgcolor=['0.122', '0.118', '0.114']
+dbgalpha=0.6
+dbradius=22.0
+disize=42.0
+dborder=true
+dshadow=true
+mshcolor=['0.0', '0.0', '0.0']
+dark-mshcolor=['0.0', '0.0', '0.0']
+mshalpha=0.35

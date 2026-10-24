@@ -102,6 +102,28 @@ PY
             ;;
         openbar)
             cp -r "$src/openbar@neuromorph/." "$out/"
+            # Lift the dock's glass off the screen edge so it floats like the bar's islands
+            python3 - "$out/stylesheets.js" <<'PY'
+import sys
+path = sys.argv[1]
+js = open(path).read()
+anchor = "        #dash StIcon {"
+assert js.count(anchor) == 1, "openbar: dash anchor not found"
+lift = """        #dashtodockContainer.bottom #dash .dash-background {
+            margin-bottom: 10px !important;
+        }
+        #dashtodockContainer.bottom #dash .dash-item-container .app-well-app,
+        #dashtodockContainer.bottom #dash .dash-item-container .show-apps,
+        #dashtodockContainer.bottom #dash .dash-item-container .overview-tile {
+            padding-top: 8px !important;
+            padding-bottom: 20px !important;
+        }
+        #dashtodockContainer.bottom #dash .app-well-app-running-dot {
+            margin-bottom: 13px !important;
+        }
+"""
+open(path, "w").write(js.replace(anchor, lift + anchor))
+PY
             ;;
     esac
     globalize_schemas "$out"
