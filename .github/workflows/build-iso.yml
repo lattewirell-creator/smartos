@@ -24,7 +24,7 @@ jobs:
         with: { node-version: 22 }
       - run: npm ci && node node_modules/electron/install.js && npm run dist:linux
       - uses: actions/upload-artifact@v4
-        with: { name: app-browser, path: release/*-linux-amd64.deb }
+        with: { name: app-browser, path: release/*-linux-amd64.deb, if-no-files-found: error }
 
   mail:
     if: github.event_name == 'push' || inputs.apps_ref != ''
@@ -39,8 +39,10 @@ jobs:
           rustup update stable && rustup default stable
           cargo install cargo-deb --locked
           scripts/build-linux.sh
+          # A wildcard folder in the upload path would keep that folder in the artifact, out of build.sh's sight
+          mkdir -p out && cp release-*/*-linux-amd64.deb out/
       - uses: actions/upload-artifact@v4
-        with: { name: app-mail, path: release-*/*-linux-amd64.deb }
+        with: { name: app-mail, path: out/*-linux-amd64.deb, if-no-files-found: error }
 
   buddy:
     if: github.event_name == 'push' || inputs.apps_ref != ''
@@ -56,7 +58,7 @@ jobs:
           cargo install cargo-deb --locked
           linux/build.sh
       - uses: actions/upload-artifact@v4
-        with: { name: app-buddy, path: dist/*-linux-amd64.deb }
+        with: { name: app-buddy, path: dist/*-linux-amd64.deb, if-no-files-found: error }
 
   iso:
     needs: [browser, mail, buddy]
