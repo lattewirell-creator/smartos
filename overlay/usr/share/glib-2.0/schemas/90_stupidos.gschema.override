@@ -44,6 +44,8 @@ switch-input-source-backward=['<Shift><Super><Alt>space', '<Shift>XF86Keyboard']
 [org.gnome.mutter]
 center-new-windows=true
 dynamic-workspaces=true
+# Crisp fractional scaling on high-DPI screens, and the option to run 120 Hz+ screens with variable refresh rate
+experimental-features=['scale-monitor-framebuffer', 'variable-refresh-rate']
 
 [org.gnome.shell]
 favorite-apps=['stupidos-install.desktop', '@BROWSER@', 'stupid-mail.desktop', 'stupid-buddy.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']

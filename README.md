@@ -11,6 +11,7 @@ Ett lugnt, snyggt och komplett operativsystem för vardagen. Stupid OS bygger p�
 - **Stupid Apps:** varje dag kollar Stupid OS efter nya versioner av apparna och installerar dem automatiskt. Nya appar från The Stupid Company dyker upp av sig själva, se nedan.
 - **Fler appar från start:** LibreOffice (Writer, Calc, Impress), Filer, Textredigerare, Terminal, Kalender, Kalkylator, Bilder, Video, Musik, Dokumentskanner, Säkerhetskopiering med mera.
 - **Appbutik:** Programvara med Flathub inbyggt. Spotify, Slack, Zoom, VS Code, Steam och tusentals andra appar installeras med ett klick. Ingen Snap.
+- **Snabbt och mjukt:** komprimerat swap-minne i RAM (zram) gör att datorn inte segar ner när minnet tar slut, kärnan prioriterar det du gör just nu och skärmar med 120 Hz eller mer kan köras med variabel uppdateringsfrekvens. Datorn väntar inte heller på nätverket när den startar.
 - **Drivrutiner:** hela Linux-firmwarepaketet, mikrokod för Intel och AMD, Mesa för grafik och skrivardrivrutiner. NVIDIA-drivrutiner installeras via *Ytterligare drivrutiner*.
 - **Svenska som standard:** svenskt språk, tangentbord och tidszon i livesessionen. Installationsprogrammet låter dig välja något annat.
 - **Installationsprogram:** Calamares i Stupid OS-design med stöd för UEFI, Secure Boot, äldre BIOS och diskkryptering.

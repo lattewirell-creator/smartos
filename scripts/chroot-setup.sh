@@ -190,6 +190,8 @@ grep -q '^GRUB_DISABLE_OS_PROBER' /etc/default/grub || echo 'GRUB_DISABLE_OS_PRO
 log "Services"
 systemctl enable stupidos-flathub.service NetworkManager.service gdm3.service 2>/dev/null || systemctl enable stupidos-flathub.service NetworkManager.service
 systemctl set-default graphical.target
+# Don't hold the boot until the network is up; the services that need it retry or start later
+systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
 
 log "Live session settings"
 cat > /etc/casper.conf <<EOF

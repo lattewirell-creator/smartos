@@ -211,17 +211,17 @@ set menu_color_highlight=black/light-gray
 
 menuentry "Prova eller installera ${DISTRO_NAME}" {
     set gfxpayload=keep
-    linux   /casper/vmlinuz boot=casper quiet splash locale=${LIVE_LOCALE} keyboard-configuration/layoutcode=${LIVE_KEYMAP} ---
+    linux   /casper/vmlinuz boot=casper quiet splash preempt=full locale=${LIVE_LOCALE} keyboard-configuration/layoutcode=${LIVE_KEYMAP} ---
     initrd  /casper/initrd
 }
 menuentry "Try or install ${DISTRO_NAME} (English)" {
     set gfxpayload=keep
-    linux   /casper/vmlinuz boot=casper quiet splash locale=en_US.UTF-8 keyboard-configuration/layoutcode=us ---
+    linux   /casper/vmlinuz boot=casper quiet splash preempt=full locale=en_US.UTF-8 keyboard-configuration/layoutcode=us ---
     initrd  /casper/initrd
 }
 menuentry "${DISTRO_NAME} i felsäkert grafikläge" {
     set gfxpayload=keep
-    linux   /casper/vmlinuz boot=casper nomodeset quiet splash locale=${LIVE_LOCALE} keyboard-configuration/layoutcode=${LIVE_KEYMAP} ---
+    linux   /casper/vmlinuz boot=casper nomodeset quiet splash preempt=full locale=${LIVE_LOCALE} keyboard-configuration/layoutcode=${LIVE_KEYMAP} ---
     initrd  /casper/initrd
 }
 if [ "\$grub_platform" = "efi" ]; then
