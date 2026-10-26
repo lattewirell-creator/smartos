@@ -49,7 +49,7 @@ experimental-features=['scale-monitor-framebuffer', 'variable-refresh-rate']
 
 [org.gnome.shell]
 favorite-apps=['stupidos-install.desktop', '@BROWSER@', 'stupid-mail.desktop', 'stupid-buddy.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
-enabled-extensions=['dash2dock-lite@icedman.github.com', 'ubuntu-appindicators@ubuntu.com', 'forge@jmmaranan.com', 'blur-my-shell@aunetx', 'rounded-window-corners@fxgn', 'openbar@neuromorph']
+enabled-extensions=['dash2dock-lite@icedman.github.com', 'ubuntu-appindicators@ubuntu.com', 'forge@jmmaranan.com', 'blur-my-shell@aunetx', 'rounded-window-corners@fxgn', 'openbar@neuromorph', 'burn-my-windows@schneegans.github.com']
 
 # The dock, macOS style: icons magnify under the pointer, apps bounce as they open, windows
 # minimise with a magic-lamp effect, one dot under running apps, Trash at the far end.
@@ -146,6 +146,24 @@ toggle-fullscreen=['<Super>f']
 # The island bar owns the top panel and the dock blurs itself; Blur my Shell does the overview and app grid
 [org.gnome.shell.extensions.blur-my-shell.panel]
 blur=false
+
+# Blur my Shell only knows Ubuntu's dock and errors on Dash2Dock, which blurs itself anyway
+[org.gnome.shell.extensions.blur-my-shell.dash-to-dock]
+blur=false
+
+# Windows open and close the way apps do on iOS: a short zoom with a fade, no tilt or squish.
+# (Burn My Windows' own default is fire.)
+[org.gnome.shell.extensions.burn-my-windows-profile]
+fire-enable-effect=false
+glide-enable-effect=true
+glide-animation-time=280
+glide-scale=0.9
+glide-squish=0.0
+glide-tilt=0.0
+glide-shift=0.0
+
+[org.gnome.shell.extensions.burn-my-windows]
+show-support-dialog=false
 
 # Buddy's ball is a transparent round window: no rounded-corner frame or shadow around it
 [org.gnome.shell.extensions.rounded-window-corners-reborn]

@@ -1,12 +1,12 @@
 #!/bin/bash
 # Builds the GNOME Shell extensions behind the Stupid OS look (tiling with gaps, blur,
-# rounded corners, floating bar, a macOS-style dock) from source at pinned versions, into a system-wide tree.
+# rounded corners, floating bar, a macOS-style dock, window animations) from source at pinned versions, into a system-wide tree.
 #
 #   scripts/build-extensions.sh STAGE_DIR
 #
 # Extensions land in STAGE_DIR/usr/share/gnome-shell/extensions/<uuid>. Their settings schemas
 # go to STAGE_DIR/usr/share/glib-2.0/schemas instead of the extension folder, so Stupid OS's
-# schema override can set their defaults. Needs git, gettext, glib-compile-schemas, node/npm.
+# schema override can set their defaults. Needs git, gettext, glib-compile-schemas, glib-compile-resources, node/npm.
 set -euo pipefail
 
 STAGE="$(realpath "$1")"
@@ -22,6 +22,7 @@ forge|https://github.com/forge-ext/forge|v49-89|forge@jmmaranan.com
 rounded-window-corners|https://github.com/flexagoon/rounded-window-corners|12|rounded-window-corners@fxgn
 openbar|https://github.com/neuromorph/openbar|01fb24217e|openbar@neuromorph
 dash2dock|https://github.com/icedman/dash2dock-lite|v50.1|dash2dock-lite@icedman.github.com
+burn-my-windows|https://github.com/Schneegans/Burn-My-Windows|v48|burn-my-windows@schneegans.github.com
 "
 
 fetch() {  # name url ref
@@ -110,6 +111,19 @@ PY
             rm -rf "$out"/{.git,.github,build,tests,tools,screenshots,docs,agents,node_modules} \
                    "$out"/{Makefile,install.sh,eslint.config.js,package.json,package-lock.json,schemas/gschemas.compiled}
             rm -f "$out"/*.md
+            ;;
+        burn-my-windows)
+            # What their Makefile zips: the JS, the bundled resources, locales, schemas
+            (cd "$src/resources" && find . -mindepth 2 -type f -printf '<file>%P</file>\n' | sort \
+                | { echo "<?xml version='1.0' encoding='UTF-8'?><gresources><gresource>"; cat; echo "</gresource></gresources>"; } \
+                > burn-my-windows.gresource.xml \
+                && glib-compile-resources --generate burn-my-windows.gresource.xml)
+            mkdir -p "$out/resources" "$out/src/effects" "$out/schemas"
+            cp "$src"/{extension.js,prefs.js,metadata.json,LICENSE} "$out/"
+            cp "$src"/src/*.js "$out/src/" && cp "$src"/src/effects/*.js "$out/src/effects/"
+            cp "$src/resources/burn-my-windows.gresource" "$out/resources/"
+            cp "$src"/schemas/*.gschema.xml "$out/schemas/"
+            locales "$src/po" "$out" "burn-my-windows"
             ;;
     esac
     globalize_schemas "$out"

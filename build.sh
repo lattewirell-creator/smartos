@@ -26,7 +26,7 @@ die() { echo -e "\033[1;31m[stupidos] $*\033[0m" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || die "Run as root: sudo ./build.sh"
 
 HOST_DEPS=(debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed
-           shim-signed mtools dosfstools librsvg2-bin imagemagick fonts-inter git gettext make npm)
+           shim-signed mtools dosfstools librsvg2-bin imagemagick fonts-inter git gettext make npm libglib2.0-dev-bin)
 missing=()
 for p in "${HOST_DEPS[@]}"; do dpkg -s "$p" >/dev/null 2>&1 || missing+=("$p"); done
 if [ ${#missing[@]} -gt 0 ]; then
