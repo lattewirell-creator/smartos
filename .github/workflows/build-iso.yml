@@ -10,6 +10,9 @@ on:
   push:
     tags: ["v*"]
 
+permissions:
+  contents: write
+
 jobs:
   # The Stupid apps are built from source so the ISO doesn't depend on their Linux releases being out.
   # If one fails, the ISO is still built and that app comes from its latest release instead.
@@ -84,27 +87,37 @@ jobs:
           mkdir -p apps && ls -l apps
           sudo WORK=/mnt/stupidos-work STUPID_APPS_DIR="$PWD/apps" ./build.sh
 
-      - name: Split ISO for the release (GitHub caps files at 2 GB)
+      - name: Get the ISO ready to publish
+        id: iso
         run: |
           cd out
           sudo chown -R "$USER" .
           iso=$(ls StupidOS-*-amd64.iso)
-          split -b 1900M -d -a 2 "$iso" "$iso.part"
+          echo "name=$iso" >> "$GITHUB_OUTPUT"
+          # A release file can be at most 2 GiB. Stay one download while it fits; split only if it outgrows that.
+          if [ "$(stat -c %s "$iso")" -ge 2147483648 ]; then
+            split -b 1900M -d -a 2 "$iso" "$iso.part" && rm "$iso"
+            echo "::warning::The ISO is over 2 GiB, so the release carries it in parts"
+          fi
           ls -lh
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: stupidos-iso
-          path: |
-            out/*.iso.part*
-            out/*.sha256
-          retention-days: 14
-
+      # Every build becomes the latest release, so this link always gives the newest ISO in one file:
+      # https://github.com/lattewirell-creator/smartos/releases/latest/download/StupidOS-1.0-amd64.iso
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('build-{0}', github.run_number) }}
+          name: Stupid OS ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('(bygge {0})', github.run_number) }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
           files: |
-            out/*.iso.part*
-            out/*.sha256
+            out/StupidOS-*-amd64.iso*
+          body: |
+            ## Installera Stupid OS
+
+            1. Ladda ner **${{ steps.iso.outputs.name }}** här nedanför.
+            2. Skriv filen till ett USB-minne på minst 8 GB med [balenaEtcher](https://etcher.balena.io): välj filen, välj USB-minnet, klicka på *Flash*.
+            3. Starta datorn från USB-minnet. Tryck F12, F11, F2 eller Esc direkt när datorn startar för att få upp startmenyn.
+            4. Prova Stupid OS direkt från USB-minnet, och klicka på *Installera Stupid OS* i dockan när du vill installera på riktigt.
+
+            Kontrollsumman (SHA-256) ligger i `.sha256`-filen.

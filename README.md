@@ -16,6 +16,16 @@ Ett lugnt, snyggt och komplett operativsystem för vardagen. Stupid OS bygger p�
 - **Svenska som standard:** svenskt språk, tangentbord och tidszon i livesessionen. Installationsprogrammet låter dig välja något annat.
 - **Installationsprogram:** Calamares i Stupid OS-design med stöd för UEFI, Secure Boot, äldre BIOS och diskkryptering.
 
+## Installera på en dator
+
+1. Ladda ner [StupidOS-1.0-amd64.iso](https://github.com/lattewirell-creator/smartos/releases/latest/download/StupidOS-1.0-amd64.iso). Länken ger alltid den senaste versionen.
+2. Skriv filen till ett USB-minne på minst 8 GB med [balenaEtcher](https://etcher.balena.io): välj filen, välj USB-minnet och klicka på *Flash*.
+3. Starta datorn från USB-minnet. Oftast trycker du F12, F11, F2 eller Esc direkt vid start för att få upp startmenyn.
+4. Välj *Prova eller installera Stupid OS*. Nu kör du Stupid OS direkt från USB-minnet utan att något ändras på datorn.
+5. Klicka på *Installera Stupid OS* i dockan när du vill installera på riktigt.
+
+Vill du testa i en virtuell maskin först kör du `./scripts/test-vm.sh` (behöver paketen `qemu-system-x86` och `ovmf`).
+
 ## Bygga ISO-filen
 
 Det behövs en dator eller virtuell maskin med Ubuntu 24.04 och cirka 25 GB ledigt diskutrymme.
@@ -26,21 +36,7 @@ sudo ./build.sh
 
 Färdig fil hamnar i `out/StupidOS-1.0-amd64.iso`. Har du redan byggt en gång och bara ändrat något i själva ISO-paketeringen räcker `sudo ./build.sh --iso-only`.
 
-Bygget kan också köras på GitHub: gå till *Actions → Build Stupid OS ISO → Run workflow*. Om du pushar en tagg som `v1.0` publiceras ISO-filen som en release. GitHub tillåter max 2 GB per fil, så ISO-filen delas upp i delar som du sätter ihop så här:
-
-```bash
-cat StupidOS-1.0-amd64.iso.part* > StupidOS-1.0-amd64.iso      # Mac och Linux
-copy /b StupidOS-1.0-amd64.iso.part00+StupidOS-1.0-amd64.iso.part01 StupidOS-1.0-amd64.iso   # Windows
-```
-
-## Installera på en dator
-
-1. Skriv ISO-filen till ett USB-minne (minst 8 GB) med [balenaEtcher](https://etcher.balena.io) eller Rufus.
-2. Starta datorn från USB-minnet. Oftast trycker du F12, F11, F2 eller Esc direkt vid start för att få upp startmenyn.
-3. Välj *Prova eller installera Stupid OS*. Nu kör du Stupid OS direkt från USB-minnet utan att något ändras på datorn.
-4. Klicka på *Installera Stupid OS* i dockan när du vill installera på riktigt.
-
-Vill du testa i en virtuell maskin först kör du `./scripts/test-vm.sh` (behöver paketen `qemu-system-x86` och `ovmf`).
+Bygget kan också köras på GitHub: gå till *Actions → Build Stupid OS ISO → Run workflow*. Varje bygge publiceras som en ny release och blir det som nedladdningslänken ovan pekar på. Pushar du en tagg som `v1.0` får releasen det namnet.
 
 ## Kortkommandon
 
