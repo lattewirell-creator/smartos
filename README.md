@@ -6,7 +6,7 @@ Ett lugnt, snyggt och komplett operativsystem för vardagen. Stupid OS bygger p�
 
 ## Det här ingår
 
-- **Skrivbord:** GNOME med ett utseende i Hyprland-anda: fönster som lägger sig sida vid sida automatiskt med luft emellan, rundade hörn, glaseffekt, en svävande toppbar i öar och en terrakottafärgad ram runt fönstret du jobbar i. Dockan fungerar som på en Mac: ikonerna förstoras när du drar musen över dem, appar studsar när de startar och fönster sugs ner i dockan när du minimerar dem. Fönster zoomar mjukt in och ut när de öppnas och stängs, som appar på iOS. Mörkt läge som standard, typsnittet Inter, egna bakgrundsbilder och en egen startskärm.
+- **Skrivbord:** GNOME med ett utseende i Hyprland-anda: fönster som lägger sig sida vid sida automatiskt med luft emellan, rundade hörn, glaseffekt, en svävande toppbar i öar och en terrakottafärgad ram runt fönstret du jobbar i. Dockan fungerar som på en Mac: ikonerna förstoras när du drar musen över dem, appar studsar när de startar och fönster sugs ner i dockan när du minimerar dem. Fönster zoomar mjukt in och ut när de öppnas och stängs, som appar på iOS. Mörkt läge som standard, rundade appikoner med mappar i terrakotta, typsnittet Inter, egna bakgrundsbilder och en egen startskärm.
 - **The Stupid Company-appar:** The Stupid Browser är standardwebbläsare, The Stupid Mail sköter mejlen och The Stupid Buddy är systemets AI-assistent. Tryck **Super+Mellanslag** var du än är, skriv eller säg vad du vill ha hjälp med, så öppnar Buddy appar, ändrar inställningar, letar fram filer och skriver texter åt dig.
 - **Stupid Apps:** varje dag kollar Stupid OS efter nya versioner av apparna och installerar dem automatiskt. Nya appar från The Stupid Company dyker upp av sig själva, se nedan.
 - **Fler appar från start:** LibreOffice (Writer, Calc, Impress), Filer, Textredigerare, Terminal, Kalender, Kalkylator, Bilder, Video, Musik, Dokumentskanner, Säkerhetskopiering med mera.
@@ -73,6 +73,7 @@ Repot behöver vara publikt för att datorerna ska kunna läsa listan. Är det p
 | The Stupid Company-appar | `config/stupid-apps.json` |
 | Logotyp och bakgrundsbilder | `branding/` |
 | GNOME-tillägg för utseendet | `scripts/build-extensions.sh` |
+| Ikontema | `scripts/build-icons.sh` |
 | Skrivbordets standardinställningar | `overlay/usr/share/glib-2.0/schemas/90_stupidos.gschema.override` |
 | Installationsprogrammet | `overlay/etc/calamares/` |
 | Själva bygget | `build.sh` och `scripts/chroot-setup.sh` |

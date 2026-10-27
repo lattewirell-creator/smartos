@@ -164,6 +164,7 @@ xdg_mime_default() { echo "$2=$1"; }
 } > /usr/share/applications/stupidos-mimeapps.list
 mkdir -p /etc/xdg && cp /usr/share/applications/stupidos-mimeapps.list /etc/xdg/mimeapps.list
 glib-compile-schemas /usr/share/glib-2.0/schemas
+for t in /usr/share/icons/Colloid-Terracotta-*; do gtk-update-icon-cache -q -f "$t"; done
 
 # System-wide GNOME settings that need dconf (custom shortcuts can't live in a schema override)
 dconf update

@@ -2,7 +2,8 @@
 
 [org.gnome.desktop.interface]
 gtk-theme='Yaru'
-icon-theme='Yaru'
+# Colloid: rounded app icons, folders in the house terracotta (scripts/build-icons.sh)
+icon-theme='Colloid-Terracotta-Dark'
 cursor-theme='Yaru'
 font-name='Inter 11'
 document-font-name='Inter 11'

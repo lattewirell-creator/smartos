@@ -53,6 +53,7 @@ render_branding() {
     cp -a "$ROOT_DIR/overlay/." "$S/"
     install -Dm644 "$ROOT_DIR/config/stupid-apps.json" "$S/usr/share/stupidos/stupid-apps.json"
     "$ROOT_DIR/scripts/build-extensions.sh" "$S"
+    "$ROOT_DIR/scripts/build-icons.sh" "$S"
 
     install -Dm644 "$B/wallpaper-light.svg" "$S/usr/share/backgrounds/stupidos/wallpaper-light.svg"
     install -Dm644 "$B/wallpaper-dark.svg"  "$S/usr/share/backgrounds/stupidos/wallpaper-dark.svg"
