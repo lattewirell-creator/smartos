@@ -1,0 +1,35 @@
+{
+  "uid": "playbook_card_app",
+  "type": "app",
+  "config": {
+    "description": "Guidade säljplaybooks direkt på kontakt- och affärsposten. Svaren sparas i riktiga CRM-properties.",
+    "name": "Playbook-kort",
+    "distribution": "private",
+    "auth": {
+      "type": "static",
+      "requiredScopes": [
+        "oauth",
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "crm.objects.deals.read",
+        "crm.objects.deals.write",
+        "crm.schemas.contacts.read",
+        "crm.schemas.contacts.write",
+        "crm.schemas.deals.read",
+        "crm.schemas.deals.write"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [],
+      "iframe": [],
+      "img": []
+    },
+    "support": {
+      "supportEmail": "nils@purasu.se",
+      "documentationUrl": "https://github.com/lattewirell-creator/smartos/tree/main/hubspot-playbook-card",
+      "supportUrl": "https://github.com/lattewirell-creator/smartos/tree/main/hubspot-playbook-card"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "hubspot-playbook-card",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "npm --prefix src/app/cards install",
+    "validate": "node setup/validate.mjs",
+    "test": "node --test setup/mapping.test.mjs setup/create-properties.test.mjs && npm --prefix src/app/cards test && npm --prefix src/app/cards run typecheck",
+    "setup:dry": "node setup/create-properties.mjs",
+    "setup:apply": "node setup/create-properties.mjs --apply",
+    "upload": "npm run validate && hs project upload"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

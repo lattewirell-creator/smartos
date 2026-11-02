@@ -1,0 +1,10 @@
+{
+  "uid": "playbook_card",
+  "type": "card",
+  "config": {
+    "name": "Playbook",
+    "location": "crm.record.tab",
+    "entrypoint": "/app/cards/PlaybookCard.tsx",
+    "objectTypes": ["contacts", "deals"]
+  }
+}
