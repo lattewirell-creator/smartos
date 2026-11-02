@@ -85,3 +85,8 @@ test('varje playbook får en klar-datum-property', () => {
   assert.equal(completionProperty({ id: 'demo-forslag', name: 'Demo' }, 'g').name, 'pb_done_demo_forslag');
   assert.equal(new Set(names).size, names.length, 'inga dubbletter');
 });
+
+test('validateConfig stoppar frågor som krockar med klar-datum', () => {
+  const pb = { id: 'x', name: 'X', objectType: 'deals', description: '', steps: [{ id: 's', name: 'S', goal: '', tip: '', questions: [{ property: 'pb_done_x', label: 'X?', type: 'date' }] }] };
+  assert.ok(validateConfig([pb], propertyGroups).some((e) => e.includes('reserverade')));
+});

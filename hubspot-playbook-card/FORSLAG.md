@@ -12,7 +12,7 @@ Det är byggt, testat och klart att laddas upp. Det som återstår är cirka 30 
 
 **Serverless-funktionen kan kräva just den Enterprise-licens man ville slippa.** HubSpots dokumentation för plattform 2026.03, som är den aktuella, säger att en app med serverless-funktioner kräver en Enterprise-prenumeration för att installeras. Den äldre plattformen 2025.1 är markerad som utfasad i HubSpots egna verktyg, så att bygga nytt på den är ingen väg runt kravet. Steg 5 i inlägget riskerar alltså att flytta Enterprise-kravet från Sales Hub till appen.
 
-**HubDB är inte gratis.** HubDB ingår inte i Sales Hub, utan i de högre nivåerna av HubSpots CMS-paket (Content Hub). Har kunden inte det blir steg 7 en ny licensfråga.
+**HubDB är inte gratis.** HubDB ingår inte i Sales Hub. Det kräver ytterligare ett betalt paket, till exempel Content Hub Professional. Har kunden inte det blir steg 7 en ny licensfråga.
 
 **Egen skrivkod är eget ansvar.** Någon ska hantera token, fälttyper, datumformat, flervalsfält, valideringsfel och behörigheter. Allt det finns redan i HubSpots property-editor.
 
@@ -34,7 +34,7 @@ Det är byggt, testat och klart att laddas upp. Det som återstår är cirka 30 
 
 Utöver originalet får säljaren ett mål och ett konkret säljtips per steg, en stegindikator som visar vad som är klart, och en tydlig markering när obligatoriska frågor saknas. Kortet hoppar automatiskt till första steget som inte är klart, så säljaren börjar där hen slutade senast.
 
-Varje playbook får dessutom en datum-property, till exempel **Playbook klar: Discovery**, som ett enkelt workflow sätter när de obligatoriska frågorna är besvarade. Det ger en tidslinje i stil med Pros anteckning, men som går att rapportera på: andel affärer med genomförd discovery per säljare, och vinstfrekvens med och utan playbook.
+Varje playbook får dessutom en datum-property, till exempel **Playbook klar: Discovery**, som ett enkelt workflow sätter när de obligatoriska frågorna är besvarade. Det ger en tidslinje i stil med anteckningen i Pro-playbooks, men som går att rapportera på: andel affärer med genomförd discovery per säljare, och vinstfrekvens med och utan playbook.
 
 Innehållet är skrivet för nordisk B2B: fyra playbooks (Kvalificering på kontakter, Discovery, Demo & förslag och Förhandling & avslut på affärer), 13 steg och 45 frågor. Frågorna är valda så att det som ska rapporteras blir rullgardiner, datum, nummer och ja/nej. Fritext finns bara där fritext behövs.
 
@@ -61,7 +61,7 @@ Två saker bör vi känna till innan vi säljer in det brett:
 |---|---|---|
 | I kväll | Analys, arkitektur, verifiering mot HubSpots SDK och mallar | Klart |
 | I kväll | Kort, logik, setup-skript, 45 frågor i fyra playbooks | Klart |
-| I kväll | 44 automatiska tester och typkontroll | Klart, alla gröna |
+| I kväll | 45 automatiska tester och typkontroll | Klart, alla gröna |
 | I kväll | Förslag och installationsguide | Klart |
 | I kväll | Oberoende kvalitetsgranskning, åtgärder och omgranskning | Klart |
 | I morgon, cirka 30 min | `hs account auth`, `npm run upload`, installera appen, `npm run setup:apply`, lägg kortet på posterna, workflows för klar-datum | Kräver inloggning i HubSpot |

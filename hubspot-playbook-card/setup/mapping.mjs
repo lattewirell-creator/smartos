@@ -121,6 +121,7 @@ export function validateConfig(playbooks, propertyGroups) {
       errors.push(`${where}: dealStages fungerar bara för deals`);
     }
     if (!playbook.steps?.length) errors.push(`${where}: har inga steg`);
+    const reserved = completionProperty(playbook, '').name;
     if (!/^[a-z0-9-]+$/.test(playbook.id ?? '')) {
       errors.push(`${where}: id får bara innehålla a-z, 0-9 och bindestreck`);
     }
@@ -143,6 +144,9 @@ export function validateConfig(playbooks, propertyGroups) {
         if (!TYPE_MAP[q.type]) errors.push(`${qWhere}: okänd typ "${q.type}"`);
         if (!q.label?.trim()) errors.push(`${qWhere}: label saknas`);
         if (seenInStep.has(q.property)) errors.push(`${qWhere}: dubblett i samma steg`);
+        if (q.property?.startsWith('pb_done_') || q.property === reserved) {
+          errors.push(`${qWhere}: namn som börjar på pb_done_ är reserverade för klar-datum`);
+        }
         seenInStep.add(q.property);
         const needsOptions = q.type === 'select' || q.type === 'multiselect';
         if (needsOptions && !(q.options?.length >= 2)) {

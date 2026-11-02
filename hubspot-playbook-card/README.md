@@ -61,7 +61,7 @@ Du behöver Node 20.12 eller senare, HubSpot CLI och rättigheten att skapa appa
 
 6. **Markera genomförda playbooks (valfritt, rekommenderas)**
 
-   Skapa ett affärsbaserat workflow per playbook, till exempel för Discovery:
+   Skapa ett workflow per playbook: kontaktbaserat för Kvalificering och affärsbaserat för de tre övriga. Till exempel för Discovery:
    - Registrering: alla obligatoriska Discovery-frågor *är kända* och **Playbook klar: Discovery** *är okänd*.
    - Åtgärd: sätt **Playbook klar: Discovery** till datumet då åtgärden körs.
 
@@ -85,7 +85,7 @@ Vill du använda en befintlig property, till exempel `closedate` eller `amount`,
 ## Utveckling och test
 
 ```bash
-npm test            # 44 tester: logik, kortet renderat med HubSpots testverktyg, setup-skriptet mot en lokal testserver, typkontroll
+npm test            # 45 tester: logik, kortet renderat med HubSpots testverktyg, setup-skriptet mot en lokal testserver, typkontroll
 npm run validate    # kontrollerar playbooks.js
 hs project dev      # kör kortet lokalt mot portalen med live-omladdning
 ```
