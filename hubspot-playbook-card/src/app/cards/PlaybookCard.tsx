@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Button,
@@ -61,15 +61,19 @@ export const PlaybookCard = ({
 
   // Svar som sparas i kortet (eller någon annanstans på posten) kommer in här
   // direkt, så att framstegen uppdateras utan omladdning.
+  // Uppdateringarna är alltid nyare än första hämtningen och vinner därför.
   const [liveValues, setLiveValues] = useState<PropertyValues>({});
+  // SDK:t erbjuder ingen avregistrering, så lyssnaren registreras bara en gång
+  // per uppsättning properties, även om actions skulle få ny identitet.
+  const registeredFor = useRef<string | null>(null);
   useEffect(() => {
-    if (watched.length === 0) return;
+    const key = watched.join(',');
+    if (watched.length === 0 || registeredFor.current === key) return;
+    registeredFor.current = key;
     actions.onCrmPropertiesUpdate(watched, (updated, updateError) => {
       if (!updateError) setLiveValues((prev) => ({ ...prev, ...updated }));
     });
-    // Registreras en gång per uppsättning properties.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watched.join(',')]);
+  }, [actions, watched]);
 
   const values: PropertyValues = useMemo(
     () => ({ ...properties, ...liveValues }),
@@ -77,14 +81,18 @@ export const PlaybookCard = ({
   );
 
   const [selectedPlaybookId, setSelectedPlaybookId] = useState<string | null>(null);
-  const [selectedStep, setSelectedStep] = useState<number | null>(null);
+  // Valt steg gäller bara den playbook det valdes i. Byter playbooken, till
+  // exempel för att affären flyttats till en ny fas, börjar säljaren på
+  // första ofärdiga steget igen.
+  const [selectedStep, setSelectedStep] = useState<{
+    playbookId: string;
+    index: number;
+  } | null>(null);
 
   // Hämtar om värdena när säljaren byter steg, som extra säkerhet om en
-  // uppdatering inte nått kortet.
+  // uppdatering inte nått kortet. Fel här ska inte störa säljaren.
   const sync = useCallback(() => {
-    refetch()
-      .then(() => setLiveValues({}))
-      .catch(() => undefined);
+    refetch().catch(() => undefined);
   }, [refetch]);
 
   if (!objectType || available.length === 0) {
@@ -119,9 +127,22 @@ export const PlaybookCard = ({
   const isAutoPicked = !selectedPlaybookId && objectType === 'deals' &&
     Boolean(values.dealstage && playbook.dealStages?.includes(values.dealstage));
 
+  if (playbook.steps.length === 0) {
+    return (
+      <EmptyState title="Playbooken saknar steg" layout="vertical" imageName="building">
+        <Text>
+          Lägg till minst ett steg med frågor i playbooks.js och kör npm run
+          upload.
+        </Text>
+      </EmptyState>
+    );
+  }
+
   const lastStep = playbook.steps.length - 1;
+  const chosenIndex =
+    selectedStep?.playbookId === playbook.id ? selectedStep.index : null;
   const stepIndex = Math.min(
-    selectedStep ?? firstOpenStepIndex(playbook, values),
+    chosenIndex ?? firstOpenStepIndex(playbook, values),
     lastStep,
   );
   const step = playbook.steps[stepIndex];
@@ -129,7 +150,10 @@ export const PlaybookCard = ({
   const progress = playbookProgress(playbook, values);
 
   const goToStep = (index: number) => {
-    setSelectedStep(Math.max(0, Math.min(index, lastStep)));
+    setSelectedStep({
+      playbookId: playbook.id,
+      index: Math.max(0, Math.min(index, lastStep)),
+    });
     sync();
   };
 
@@ -204,7 +228,9 @@ export const PlaybookCard = ({
           <CrmPropertyList properties={stepProperties(step)} direction="column" />
           {status.missingRequired.length > 0 && (
             <Text variant="microcopy">
-              Måste besvaras innan steget är klart: {status.missingRequired.join(', ')}.
+              {status.missingRequired.length === 1
+                ? '1 obligatorisk fråga kvar innan steget är klart.'
+                : `${status.missingRequired.length} obligatoriska frågor kvar innan steget är klart.`}
             </Text>
           )}
         </Flex>

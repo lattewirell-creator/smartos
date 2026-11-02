@@ -62,6 +62,22 @@ export function toHubSpotProperty(question, groupName) {
   return body;
 }
 
+/**
+ * Datum-property som visar när playbooken genomfördes. Sätts av ett workflow
+ * (se README) och gör det möjligt att rapportera efterlevnad per säljare.
+ */
+export function completionProperty(playbook, groupName) {
+  return {
+    name: `pb_done_${playbook.id.replace(/-/g, '_')}`.slice(0, 50),
+    label: `Playbook klar: ${playbook.name}`,
+    description: 'Sätts automatiskt när alla obligatoriska frågor i playbooken är besvarade.',
+    groupName,
+    type: 'date',
+    fieldType: 'date',
+    formField: false,
+  };
+}
+
 /** Alla properties som ska finnas, grupperade per objekttyp. */
 export function plannedProperties(playbooks, propertyGroups) {
   const plan = new Map();
@@ -76,6 +92,7 @@ export function plannedProperties(playbooks, propertyGroups) {
         list.push(toHubSpotProperty(question, group.name));
       }
     }
+    list.push(completionProperty(playbook, group.name));
     plan.set(playbook.objectType, list);
   }
   return plan;
@@ -104,6 +121,9 @@ export function validateConfig(playbooks, propertyGroups) {
       errors.push(`${where}: dealStages fungerar bara för deals`);
     }
     if (!playbook.steps?.length) errors.push(`${where}: har inga steg`);
+    if (!/^[a-z0-9-]+$/.test(playbook.id ?? '')) {
+      errors.push(`${where}: id får bara innehålla a-z, 0-9 och bindestreck`);
+    }
 
     const seenSteps = new Set();
     for (const step of playbook.steps ?? []) {

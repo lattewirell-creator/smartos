@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { optionValue, plannedProperties, toHubSpotProperty, validateConfig } from './mapping.mjs';
+import { completionProperty, optionValue, plannedProperties, toHubSpotProperty, validateConfig } from './mapping.mjs';
 import { playbooks, propertyGroups } from '../src/app/cards/playbooks.js';
 
 test('levererade playbooks är giltiga', () => {
@@ -72,4 +72,16 @@ test('validateConfig stoppar fler än 24 frågor i ett steg', () => {
   const questions = Array.from({ length: 25 }, (_, i) => ({ property: `pb_q${i}`, label: `Q${i}?`, type: 'text' }));
   const errors = validateConfig([{ id: 'x', name: 'X', objectType: 'deals', description: '', steps: [{ id: 's', name: 'S', goal: '', tip: '', questions }] }], propertyGroups);
   assert.ok(errors.some((e) => e.includes('max 24')));
+});
+
+test('varje playbook får en klar-datum-property', () => {
+  const plan = plannedProperties(playbooks, propertyGroups);
+  const names = [...plan.values()].flat().map((p) => p.name);
+  for (const playbook of playbooks) {
+    const done = completionProperty(playbook, 'pb_playbook');
+    assert.ok(names.includes(done.name), done.name);
+    assert.equal(done.type, 'date');
+  }
+  assert.equal(completionProperty({ id: 'demo-forslag', name: 'Demo' }, 'g').name, 'pb_done_demo_forslag');
+  assert.equal(new Set(names).size, names.length, 'inga dubbletter');
 });

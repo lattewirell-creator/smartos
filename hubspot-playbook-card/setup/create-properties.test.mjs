@@ -57,11 +57,11 @@ test('torrkörning skapar inget, --apply skapar det som saknas, omkörning är o
     const groups = created.filter((c) => c.url.endsWith('/groups'));
     const props = created.filter((c) => !c.url.endsWith('/groups'));
     assert.equal(groups.length, 2);
-    assert.equal(props.length, 44); // 45 frågor minus den som redan fanns
+    assert.equal(props.length, 48); // 45 frågor + 4 klar-datum, minus den som redan fanns
     assert.ok(props.every((p) => p.payload.groupName === 'pb_playbook'));
 
     const again = await exec(port, ['--apply']);
-    assert.equal(created.length, 46);
+    assert.equal(created.length, 50);
     assert.match(again.stdout, /Allt finns redan på plats/);
   } finally {
     server.close();
@@ -75,7 +75,7 @@ test('fel token ger tydligt fel och avbryter', async () => {
       run(process.execPath, [script], {
         env: { ...process.env, HUBSPOT_TOKEN: 'fel', HUBSPOT_API_BASE: `http://127.0.0.1:${port}` },
       }),
-      (err) => /401/.test(err.stderr),
+      (err) => /Avbrutet: .*401/.test(err.stderr) && !/at .*\.mjs/.test(err.stderr),
     );
   } finally {
     server.close();

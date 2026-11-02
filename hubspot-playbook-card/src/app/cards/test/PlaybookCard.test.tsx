@@ -9,6 +9,7 @@ import {
   Select,
   StepIndicator,
   Tag,
+  Text,
 } from '@hubspot/ui-extensions';
 import { CrmPropertyList } from '@hubspot/ui-extensions/crm';
 import { createRenderer } from '@hubspot/ui-extensions/testing';
@@ -20,7 +21,11 @@ const CONTACT = '0-1';
 const flush = () => new Promise((resolve) => setTimeout(resolve, 20));
 const DEAL = '0-3';
 
-function setup(objectTypeId: string, values: PropertyValues = {}) {
+function setup(
+  objectTypeId: string,
+  values: PropertyValues = {},
+  refetch: () => Promise<void> = async () => {},
+) {
   const renderer = createRenderer('crm.record.tab');
   renderer.mocks.context.crm.objectTypeId = objectTypeId;
   renderer.mocks.useRecordPropertiesCurrent.willCall((options) => ({
@@ -30,7 +35,7 @@ function setup(objectTypeId: string, values: PropertyValues = {}) {
     error: null,
     isLoading: false,
     isRefetching: false,
-    refetch: async () => {},
+    refetch,
   }));
   renderer.render(<PlaybookCard playbooks={allPlaybooks} />);
   return renderer;
@@ -106,8 +111,8 @@ describe('PlaybookCard', () => {
   it('uppdaterar framstegen direkt när ett svar sparas', async () => {
     const renderer = setup(CONTACT);
     const spy = renderer.mocks.actions.onCrmPropertiesUpdate;
-    // useEffect körs asynkront. Testverktygets waitFor blockerar effekter,
-    // så vi släpper event-loopen själva.
+    // useEffect körs asynkront. I testverktyget (ui-extensions 1.0.0) körs
+    // effekter inte medan waitFor pollar, så vi släpper event-loopen själva.
     await flush();
     expect(spy.callCount).toBe(1);
     const [watched, callback] = spy.calls[0];
@@ -137,5 +142,53 @@ describe('PlaybookCard', () => {
     });
     failing.render(<PlaybookCard playbooks={allPlaybooks} />);
     expect(failing.find(ErrorState).props.title).toBe('Playbooken kunde inte laddas');
+  });
+
+  it('säger hur många obligatoriska frågor som återstår', () => {
+    const { findAll } = setup(CONTACT, { pb_urgency: 'nu' });
+    const texts = findAll(Text).map((t) => t.text);
+    expect(texts).toContain('1 obligatorisk fråga kvar innan steget är klart.');
+  });
+
+  it('hämtar om värdena när säljaren byter steg', async () => {
+    let refetches = 0;
+    const renderer = setup(CONTACT, {}, async () => {
+      refetches++;
+    });
+    renderer.find(Button, { variant: 'primary' }).trigger('onClick');
+    await flush();
+    expect(refetches).toBe(1);
+  });
+
+  it('byter playbook och börjar om på första öppna steget när affärens fas ändras', async () => {
+    const renderer = setup(DEAL, { dealstage: 'appointmentscheduled' });
+    expect(renderer.find(Heading).text).toBe('Discovery');
+    renderer.find(Button, { variant: 'primary' }).trigger('onClick');
+    await flush();
+    expect(renderer.find(StepIndicator).props.currentStep).toBe(1);
+
+    await flush();
+    const [, callback] = renderer.mocks.actions.onCrmPropertiesUpdate.calls[0];
+    callback({ dealstage: 'contractsent' });
+    await flush();
+    expect(renderer.find(Heading).text).toBe('Förhandling');
+    expect(renderer.find(StepIndicator).props.currentStep).toBe(0);
+  });
+
+  it('kraschar inte på en playbook utan steg', () => {
+    const renderer = createRenderer('crm.record.tab');
+    renderer.render(
+      <PlaybookCard playbooks={[{ ...allPlaybooks[0], steps: [] }]} />,
+    );
+    expect(renderer.find(EmptyState).props.title).toBe('Playbooken saknar steg');
+  });
+
+  it('registrerar bara en lyssnare även efter flera omritningar', async () => {
+    const renderer = setup(CONTACT);
+    renderer.find(Button, { variant: 'primary' }).trigger('onClick');
+    await flush();
+    renderer.find(Button, { variant: 'secondary' }).trigger('onClick');
+    await flush();
+    expect(renderer.mocks.actions.onCrmPropertiesUpdate.callCount).toBe(1);
   });
 });

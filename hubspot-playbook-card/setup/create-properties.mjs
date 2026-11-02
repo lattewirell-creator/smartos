@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 // Skapar property-grupp och properties i HubSpot utifrån playbooks.js.
 //
-//   HUBSPOT_TOKEN=... node setup/create-properties.mjs           # visar vad som skulle hända
-//   HUBSPOT_TOKEN=... node setup/create-properties.mjs --apply   # skapar det som saknas
+//   npm run setup:dry     # visar vad som skulle hända
+//   npm run setup:apply   # skapar det som saknas
 //
+// Token läses från HUBSPOT_TOKEN, eller från filen .env i projektroten
+// (HUBSPOT_TOKEN=...), så att den inte hamnar i terminalens historik.
 // Befintliga properties lämnas orörda, så skriptet går att köra flera gånger.
-// Kräver Node 20 eller senare.
+// Kräver Node 20.12 eller senare.
 
 import { playbooks, propertyGroups } from '../src/app/cards/playbooks.js';
 import { plannedProperties, validateConfig } from './mapping.mjs';
@@ -13,6 +15,14 @@ import { plannedProperties, validateConfig } from './mapping.mjs';
 // HUBSPOT_API_BASE används bara för att testa skriptet mot en lokal server.
 const API = process.env.HUBSPOT_API_BASE ?? 'https://api.hubapi.com';
 const apply = process.argv.includes('--apply');
+
+if (!process.env.HUBSPOT_TOKEN) {
+  try {
+    process.loadEnvFile(new URL('../.env', import.meta.url));
+  } catch {
+    // Ingen .env-fil, felet nedan förklarar vad som saknas.
+  }
+}
 const token = process.env.HUBSPOT_TOKEN;
 
 const errors = validateConfig(playbooks, propertyGroups);
@@ -22,7 +32,7 @@ if (errors.length) {
 }
 
 if (!token) {
-  console.error('Sätt HUBSPOT_TOKEN till appens access token (se README, steg 3).');
+  console.error('Lägg appens access token i .env som HUBSPOT_TOKEN=... (se README, steg 4).');
   process.exit(1);
 }
 
@@ -67,43 +77,50 @@ async function create(path, payload, label) {
   }
 }
 
-const plan = plannedProperties(playbooks, propertyGroups);
-let missing = 0;
+async function main() {
+  const plan = plannedProperties(playbooks, propertyGroups);
+  let missing = 0;
 
-for (const [objectType, properties] of plan) {
-  const group = propertyGroups.find((g) => g.objectType === objectType);
-  console.log(`\n${objectType}`);
+  for (const [objectType, properties] of plan) {
+    const group = propertyGroups.find((g) => g.objectType === objectType);
+    console.log(`\n${objectType}`);
 
-  if (await exists(`/crm/v3/properties/${objectType}/groups/${group.name}`)) {
-    console.log(`  [finns] grupp ${group.name}`);
-  } else {
-    missing++;
-    await create(
-      `/crm/v3/properties/${objectType}/groups`,
-      { name: group.name, label: group.label },
-      `grupp ${group.name}`,
-    );
-  }
-
-  const unique = [...new Map(properties.map((p) => [p.name, p])).values()];
-  for (const property of unique) {
-    if (await exists(`/crm/v3/properties/${objectType}/${property.name}`)) {
-      console.log(`  [finns] ${property.name}`);
-      continue;
+    if (await exists(`/crm/v3/properties/${objectType}/groups/${group.name}`)) {
+      console.log(`  [finns] grupp ${group.name}`);
+    } else {
+      missing++;
+      await create(
+        `/crm/v3/properties/${objectType}/groups`,
+        { name: group.name, label: group.label },
+        `grupp ${group.name}`,
+      );
     }
-    missing++;
-    await create(
-      `/crm/v3/properties/${objectType}`,
-      property,
-      `${property.name} (${property.label})`,
-    );
+
+    const unique = [...new Map(properties.map((p) => [p.name, p])).values()];
+    for (const property of unique) {
+      if (await exists(`/crm/v3/properties/${objectType}/${property.name}`)) {
+        console.log(`  [finns] ${property.name}`);
+        continue;
+      }
+      missing++;
+      await create(
+        `/crm/v3/properties/${objectType}`,
+        property,
+        `${property.name} (${property.label})`,
+      );
+    }
+  }
+
+  if (!apply && missing > 0) {
+    console.log(`\n${missing} saker saknas. Kör igen med --apply för att skapa dem.`);
+  } else if (missing === 0) {
+    console.log('\nAllt finns redan på plats.');
+  } else {
+    console.log('\nKlart.');
   }
 }
 
-if (!apply && missing > 0) {
-  console.log(`\n${missing} saker saknas. Kör igen med --apply för att skapa dem.`);
-} else if (missing === 0) {
-  console.log('\nAllt finns redan på plats.');
-} else {
-  console.log('\nKlart.');
-}
+main().catch((error) => {
+  console.error(`\nAvbrutet: ${error.message}`);
+  process.exit(1);
+});
